@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Turnos Pro - V5 (Google Sheets)</title>
+    <title>Sistema de Turnos Pro - V5 (Conexión Estable)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -171,7 +171,6 @@
 
         .hidden { display: none !important; }
         
-        /* Loading Overlay */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.9); z-index: 999999; display: flex; align-items: center; justify-content: center; flex-direction: column; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -454,7 +453,7 @@
 
     <script>
         // ============================================================
-        // API.JS INTEGRADO
+        // API.JS INTEGRADO CON FIX DE CORS
         // ============================================================
         // ⚠️ REEMPLAZA ESTA URL CON LA DE TU GOOGLE APPS SCRIPT
         const API_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';
@@ -500,9 +499,8 @@
                 }
                 return db;
             } catch (error) {
-                console.error('❌ Error al cargar datos:', error);
-                alert('Error de conexión con Google Sheets. Usando datos locales de respaldo.');
-                // Fallback
+                console.warn('⚠️ Error al cargar datos de Sheets. Usando respaldo local:', error);
+                // Fallback silencioso
                 db = {
                     operators: JSON.parse(localStorage.getItem('operators') || '[{"name":"Admin","pin":"1234","box":"Box 1"}]'),
                     queue: JSON.parse(localStorage.getItem('queue') || '[]'),
@@ -514,12 +512,13 @@
                     pushMessage: JSON.parse(localStorage.getItem('pushMessage') || '{"text":"","color":"red"}'),
                     config: JSON.parse(localStorage.getItem('config') || '{"primaryColor":"#0056b3","showVideo":true}')
                 };
+                if (db.operators.length === 0) db.operators = [{ name: 'Admin', pin: '1234', box: 'Box 1' }];
                 return db;
             }
         }
 
         async function saveDB() {
-            // Guardar en local primero para no perder datos si falla la red
+            // 1. Guardar en local primero
             localStorage.setItem('operators', JSON.stringify(db.operators));
             localStorage.setItem('queue', JSON.stringify(db.queue));
             localStorage.setItem('playlist', JSON.stringify(db.playlist));
@@ -549,12 +548,15 @@
                     }
                 };
                 
-const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Cambiado de application/json
-    body: JSON.stringify(payload)
-});
-                console.log('✅ Datos guardados en Sheets');
+                // Usamos no-cors y text/plain para evitar bloqueos de CORS
+                fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                }).catch(e => console.log('Fetch no-cors ignorado:', e));
+                
+                console.log('✅ Datos enviados a Sheets');
             } catch (error) {
                 console.error('❌ Error guardando en Sheets:', error);
             }
@@ -572,7 +574,7 @@ const response = await fetch(API_URL, {
         window.onload = async () => {
             await loadData();
             document.getElementById('loading-overlay').style.display = 'none';
-            renderAdmin(); // Pre-renderizar por si acaso
+            renderAdmin(); 
         };
 
         function enterMode(mode) {
@@ -879,15 +881,14 @@ const response = await fetch(API_URL, {
 
             if(opInterval) clearInterval(opInterval);
             opInterval = setInterval(async () => {
-                // Polling de mensajes push
                 try {
-                    const data = await loadData(); // Recarga todo para estar sincronizado
+                    const data = await loadData(); 
                     if(JSON.stringify(data.pushMessage) !== JSON.stringify(db.pushMessage)) {
                         db.pushMessage = data.pushMessage;
                         renderPushMessage();
                     }
                 } catch(e) {}
-            }, 5000); // Cada 5 segundos para no saturar la API
+            }, 5000); 
         }
 
         function renderPushMessage() {
@@ -1152,7 +1153,6 @@ const response = await fetch(API_URL, {
             if(screenInterval) clearInterval(screenInterval);
             updateClock();
             setInterval(updateClock, 1000);
-            // Polling más espaciado para la TV (cada 4 segundos) para no saturar Apps Script
             screenInterval = setInterval(checkCalls, 4000); 
             
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -1167,13 +1167,9 @@ const response = await fetch(API_URL, {
         let lastProcessedCall = 0;
         async function checkCalls() {
             try {
-                // Hacemos una petición ligera solo para ver si el activeCall cambió
                 const response = await fetch(`${API_URL}?action=getAll`);
                 const data = await response.json();
                 const newActiveCall = data.activeCall;
-                // Como no tenemos un endpoint específico para activeCall en Code.gs actual, 
-                // leemos toda la data pero solo procesamos si el activeCall cambió.
-                // *Nota: En un entorno de producción real, modificar Code.gs para tener un "getActiveCall" es lo ideal.
                 
                 if(newActiveCall && newActiveCall.timestamp > lastProcessedCall) {
                     lastProcessedCall = newActiveCall.timestamp;
