@@ -3,136 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Turnos Pro - V5 (Conexión Estable)</title>
+    <title>Sistema de Turnos Pro - V5 (Conexión Real)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #0056b3;
-            --bg-light: #f0f4f8;
-            --card-bg: #ffffff;
-            --text-dark: #2d3748;
-            --text-muted: #718096;
-            --border-color: #e2e8f0;
+            --primary: #0056b3; --bg-light: #f0f4f8; --card-bg: #ffffff;
+            --text-dark: #2d3748; --text-muted: #718096; --border-color: #e2e8f0;
             --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --tv-blue: #0d47a1;
-            --tv-green: #2e7d32;
-            --tv-bg: #1565c0;
+            --tv-blue: #0d47a1; --tv-green: #2e7d32; --tv-bg: #1565c0;
         }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
         body { background: var(--bg-light); color: var(--text-dark); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        
         .screen { display: none; height: 100vh; width: 100vw; overflow-y: auto; background: var(--bg-light); }
         .screen.active { display: flex; }
-
-        /* ZONA SECRETA */
         #secret-trigger { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 100000; cursor: default; }
 
-        /* 0. LAUNCHER */
         #launcher-screen { align-items: center; justify-content: center; flex-direction: column; }
         #launcher-screen h1 { color: var(--primary); margin-bottom: 10px; font-size: 2.5rem; }
         .launcher-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
         .launcher-btn { padding: 30px 50px; font-size: 1.2rem; border: 2px solid var(--primary); border-radius: 12px; cursor: pointer; background: white; color: var(--primary); transition: all 0.3s ease; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .launcher-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,86,179,0.2); }
+        .launcher-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
 
-        /* 1. ADMIN (CON TABS Y PREVIEW) */
         #admin-screen { padding: 0; flex-direction: row; height: 100vh; overflow: hidden; }
-        .admin-sidebar { width: 200px; background: #fff; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.02); z-index: 10;}
-        .tab-btn { padding: 15px 20px; background: none; border: none; text-align: left; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; border-left: 4px solid transparent;}
+        .admin-sidebar { width: 200px; background: #fff; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px 0; z-index: 10;}
+        .tab-btn { padding: 15px 20px; background: none; border: none; text-align: left; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-left: 4px solid transparent; transition: 0.2s;}
         .tab-btn:hover { background: #f7fafc; color: var(--primary); }
         .tab-btn.active { background: #ebf8ff; color: var(--primary); border-left-color: var(--primary); }
-        
-        .admin-content-area { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column;}
+        .admin-content-area { flex: 1; padding: 30px; overflow-y: auto; }
         .tab-content { display: none; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .admin-preview-area { width: 450px; background: #fff; border-left: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; box-shadow: -2px 0 10px rgba(0,0,0,0.02); z-index: 10;}
+        .admin-preview-area { width: 450px; background: #fff; border-left: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; z-index: 10;}
 
         h2 { margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--bg-light); padding-bottom: 10px; font-size: 1.2rem; font-weight: 700; }
         .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .form-group label { font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-dark); }
-        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; transition: border-color 0.3s; width: 100%;}
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+        .form-group label { font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; width: 100%;}
         .form-group input[type="color"] { height: 40px; cursor: pointer; padding: 2px; }
-        .btn { padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; font-size: 0.95rem; transition: background 0.3s;}
+        .btn { padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
         .btn:hover { background: #004494; }
         .btn-danger { background: #e53e3e; padding: 6px 10px; width: auto; font-size: 0.8rem;}
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.9rem;}
         .toggle-switch { appearance: none; width: 44px; height: 24px; background: #cbd5e0; border-radius: 12px; position: relative; cursor: pointer; outline: none; transition: 0.3s; }
         .toggle-switch:checked { background: #38a169; }
-        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.3s; }
         .toggle-switch:checked::after { left: 22px; }
-
-        .help-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .help-content { background: white; width: 80%; max-width: 800px; max-height: 80vh; overflow-y: auto; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .help-content h3 { color: var(--primary); margin-bottom: 15px; }
-        .help-content p, .help-content li { margin-bottom: 10px; line-height: 1.6; }
-        .help-content ul { padding-left: 20px; margin-bottom: 20px; }
 
         .tv-preview-container { width: 100%; background: #000; aspect-ratio: 16/9; border-radius: 8px; border: 2px solid #cbd5e0; position: relative; overflow: hidden; display: flex; flex-direction: column; }
         .preview-grid { display: grid; grid-template-columns: 2.2fr 1fr; grid-template-rows: 1fr auto; height: 100%; width: 100%; gap: 2px; }
         .preview-video { background: #222; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.8rem; overflow: hidden;}
-        .preview-video img, .preview-video video { width: 100%; height: 100%; object-fit: cover; }
+        .preview-video img { width: 100%; height: 100%; object-fit: cover; }
         .preview-right { background: var(--tv-blue); display: flex; flex-direction: column; }
         .preview-ticker { display: flex; flex-direction: column; width: 100%; overflow: hidden;}
 
-        /* 2. KIOSCO */
         #kiosco-screen { flex-direction: column; background: var(--bg-light); align-items: center; overflow: hidden;}
         .kiosco-top { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto;}
-        .kiosco-box { text-align: center; max-width: 800px; width: 100%; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 20px;}
+        .kiosco-box { text-align: center; max-width: 800px; width: 100%; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .kiosco-box h1 { color: var(--primary); margin-bottom: 15px; font-size: 2rem;}
         .kiosco-input-group { display: flex; gap: 15px; margin-bottom: 20px;}
         .kiosco-input { font-size: 1.8rem; padding: 15px; width: 100%; text-align: center; border: 2px solid var(--border-color); border-radius: 10px; background: #f7fafc; outline: none;}
         .kiosco-input:focus { border-color: var(--primary); background: white;}
         .services-grid { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;}
-        .service-btn { flex: 1; min-width: 150px; padding: 20px; font-size: 1.5rem; font-weight: bold; border: 3px solid var(--border-color); border-radius: 15px; background: white; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px;}
-        .service-btn.selected { border-color: var(--primary); background: #ebf8ff; color: var(--primary); box-shadow: 0 4px 10px rgba(0,86,179,0.2);}
+        .service-btn { flex: 1; min-width: 150px; padding: 20px; font-size: 1.5rem; font-weight: bold; border: 3px solid var(--border-color); border-radius: 15px; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;}
+        .service-btn.selected { border-color: var(--primary); background: #ebf8ff; color: var(--primary); }
         .service-emoji { font-size: 3rem; }
-        .kiosco-btn { font-size: 1.8rem; padding: 20px; width: 100%; max-width: 600px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: background 0.3s; margin-top: 10px;}
-        .kiosco-btn:hover { background: #004494; }
-        
-        #virtual-keyboard { width: 100%; background: #e2e8f0; padding: 10px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); border-top: 1px solid #cbd5e0; display: flex; flex-direction: column; gap: 5px; z-index: 9999;}
+        .kiosco-btn { font-size: 1.8rem; padding: 20px; width: 100%; max-width: 600px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        #virtual-keyboard { width: 100%; background: #e2e8f0; padding: 10px; display: flex; flex-direction: column; gap: 5px; z-index: 9999;}
         .keyboard-row { display: flex; justify-content: center; gap: 5px; width: 100%;}
-        .key { background: white; border: 1px solid #cbd5e0; border-radius: 8px; flex: 1; padding: 15px 0; font-size: 1.8rem; font-weight: bold; color: #2d3748; cursor: pointer; text-align: center; box-shadow: 0 3px 0 #cbd5e0; user-select: none;}
-        .key:active { transform: translateY(3px); box-shadow: none; }
+        .key { background: white; border: 1px solid #cbd5e0; border-radius: 8px; flex: 1; padding: 15px 0; font-size: 1.8rem; font-weight: bold; color: #2d3748; cursor: pointer; text-align: center; }
+        .key:active { transform: translateY(2px); background: #cbd5e0; }
         .key.special { background: #cbd5e0; font-size: 1.5rem; flex: 2;}
         .key.space { flex: 5; }
-        
         #ticket-display { display: none; background: #ebf8ff; border: 4px dashed #63b3ed; padding: 50px; border-radius: 20px; text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;}
         #ticket-display h1 { font-size: 8rem; color: #2b6cb0; margin: 0; line-height: 1;}
 
-        /* 3. OPERADOR */
         #operador-screen { background: #edf2f7; padding: 20px; flex-direction: row; gap: 20px; justify-content: center; align-items: stretch; overflow: hidden;}
-        .op-panel { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s;}
+        .op-panel { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column;}
         .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 15px 20px; }
         .panel-header h3 { margin: 0; font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase;}
         .drag-handle { color: #cbd5e0; font-size: 1.2rem; cursor: grab; }
-        .drag-handle:active { cursor: grabbing; }
         .op-main-panel { flex: 1; min-width: 300px; max-width: 500px;}
         .op-main-content { padding: 20px; display: flex; flex-direction: column; flex: 1;}
         .op-header { text-align: center; margin-bottom: 20px; }
         .op-header h1 { color: var(--primary); font-size: 2rem; margin-bottom: 5px;}
-        .op-header p { color: var(--text-muted); font-size: 1.1rem; }
-        .btn-next { font-size: 2rem; padding: 30px; background: #38a169; color: white; border: none; border-radius: 15px; cursor: pointer; width: 100%; margin-bottom: 20px; font-weight: bold; transition: all 0.2s; box-shadow: 0 6px 0 #2f855a;}
-        .btn-next:active { transform: translateY(6px); box-shadow: none; }
-        .btn-next:hover { background: #2f855a; }
-        #op-push-zone { display: none; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-size: 1.2rem; font-weight: bold; animation: pulse 2s infinite; border: 2px solid; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .btn-next { font-size: 2rem; padding: 30px; background: #38a169; color: white; border: none; border-radius: 15px; cursor: pointer; width: 100%; margin-bottom: 20px; font-weight: bold; }
+        #op-push-zone { display: none; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-size: 1.2rem; font-weight: bold; border: 2px solid; }
         .op-side-panel { flex: 0.8; min-width: 250px; max-width: 350px;}
         #op-history-list { list-style: none; flex: 1; overflow-y: auto; padding: 10px;}
-        #op-history-list li { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; font-size: 0.95rem; cursor: pointer; transition: background 0.2s;}
-        #op-history-list li:hover { background: #f7fafc; }
+        #op-history-list li { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; font-size: 0.95rem; cursor: pointer;}
         #op-history-list li.active { background: #e6fffa; border-left: 4px solid #38a169; }
         #op-history-list li .hist-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px;}
-        #op-history-list li .hist-name { font-size: 0.85rem; color: var(--text-muted); }
         .op-notes-panel { flex: 1; min-width: 300px; max-width: 450px;}
         .notes-content { padding: 20px; display: flex; flex-direction: column; flex: 1; height: 100%;}
-        .notes-textarea { flex: 1; width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; resize: none; font-size: 1rem; line-height: 1.5; outline: none; font-family: inherit;}
-        .notes-textarea:focus { border-color: var(--primary); }
+        .notes-textarea { flex: 1; width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; resize: none; font-size: 1rem; outline: none;}
         .notes-info { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
 
-        /* 4. PANTALLA CLIENTES (TV) */
         #pantalla-screen { display: none; height: 100vh; width: 100vw; background: #000; color: white; font-family: 'Arial', sans-serif; }
         .tv-grid { display: grid; grid-template-columns: 2.2fr 1fr; grid-template-rows: 1fr auto; height: 100%; width: 100%; gap: 4px; background: #000; }
         .tv-video-area { grid-column: 1; grid-row: 1; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -141,12 +105,9 @@
         .tv-clock-area { background: var(--tv-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;}
         .weather-widget { display: flex; align-items: center; gap: 10px; }
         .weather-icon { font-size: 3rem; line-height: 1; }
-        .weather-info { display: flex; flex-direction: column; }
         .weather-temp { font-size: 1.5rem; font-weight: bold; line-height: 1;}
-        .weather-desc { font-size: 0.8rem; text-transform: capitalize; opacity: 0.8;}
         .clock-widget { text-align: right; }
         .clock-widget h1 { font-size: 3.5rem; line-height: 1; margin-bottom: 5px;}
-        .clock-widget p { font-size: 1rem; text-transform: uppercase; }
         .tv-last-call { background: var(--tv-blue); flex: 1; display: flex; flex-direction: column; }
         .tv-green-bar { background: var(--tv-green); padding: 8px 15px; font-size: 1rem; font-weight: bold; text-transform: uppercase; }
         .tv-last-call-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px;}
@@ -163,22 +124,18 @@
         .rss-text { display: inline-block; font-weight: 800; text-transform: uppercase; padding-left: 100vw; animation: marquee-left linear infinite;}
 
         #popup-turno { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); z-index: 999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .popup-card { background: var(--tv-blue); width: 55%; max-width: 900px; padding: 40px; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; border: 4px solid var(--tv-green); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .popup-card { background: var(--tv-blue); width: 55%; max-width: 900px; padding: 40px; border-radius: 25px; text-align: center; border: 4px solid var(--tv-green); display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .popup-card h3 { font-size: 1.8rem; color: #a5d6a7; margin-bottom: 10px; letter-spacing: 3px;}
-        .popup-card h1 { font-size: 10rem; margin: 0; color: #fff; line-height: 1; font-weight: 900; text-shadow: 0 5px 15px rgba(0,0,0,0.3);}
+        .popup-card h1 { font-size: 10rem; margin: 0; color: #fff; line-height: 1; font-weight: 900; }
         .popup-card h2 { font-size: 3.5rem; margin: 10px 0; color: #fff; font-weight: 400;}
         .popup-card p { font-size: 4rem; color: #fff; background: var(--tv-green); padding: 10px 30px; border-radius: 15px; font-weight: bold; margin: 0; }
-
         .hidden { display: none !important; }
-        
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.9); z-index: 999999; display: flex; align-items: center; justify-content: center; flex-direction: column; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    
-    <!-- OVERLAY DE CARGA -->
     <div id="loading-overlay">
         <div class="spinner"></div>
         Conectando con Google Sheets...
@@ -186,7 +143,6 @@
 
     <div id="secret-trigger" onmousedown="startHold()" onmouseup="cancelHold()" onmouseleave="cancelHold()" ontouchstart="startHold()" ontouchend="cancelHold()"></div>
 
-    <!-- 0. LAUNCHER -->
     <div id="launcher-screen" class="screen active">
         <h1>Seleccione el Modo</h1>
         <p style="color: var(--text-muted); margin-bottom: 20px;">(Mantén presionada la esquina superior izquierda por 3s para volver aquí).</p>
@@ -198,7 +154,6 @@
         </div>
     </div>
 
-    <!-- 1. PANTALLA ADMIN -->
     <div id="admin-screen" class="screen">
         <div class="admin-sidebar">
             <div style="padding: 0 20px 10px; font-weight: bold; color: var(--primary); font-size: 1.2rem; border-bottom: 1px solid #eee; margin-bottom: 10px;">Menú</div>
@@ -207,9 +162,7 @@
             <button class="tab-btn" onclick="openTab('tab-playlist')">🖼️ Playlist</button>
             <button class="tab-btn" onclick="openTab('tab-services')">🏥 Servicios</button>
             <button class="tab-btn" onclick="openTab('tab-rss')">📰 Tickers RSS</button>
-            <button class="tab-btn" onclick="toggleHelp()" style="margin-top: auto; color: #e53e3e;">❓ Ayuda</button>
         </div>
-        
         <div class="admin-content-area">
             <div id="tab-ops" class="tab-content active">
                 <h2>Operadores</h2>
@@ -221,61 +174,43 @@
                 <button class="btn" onclick="addOperator()">Agregar Operador</button>
                 <div id="admin-op-list" style="margin-top: 15px;"></div>
             </div>
-
             <div id="tab-msgs" class="tab-content">
                 <h2>Mensajes a Operadores</h2>
-                <div class="form-group">
-                    <label>Mensaje</label>
-                    <textarea id="admin-push-msg" rows="3" placeholder="Ej: Sistema caído, disculpen la demora..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Relevancia (Color)</label>
+                <div class="form-group"><label>Mensaje</label><textarea id="admin-push-msg" rows="3"></textarea></div>
+                <div class="form-group"><label>Relevancia</label>
                     <select id="admin-push-color">
-                        <option value="red">🔴 Crítico (Rojo)</option>
-                        <option value="yellow">🟡 Advertencia (Amarillo)</option>
-                        <option value="green">🟢 Informativo (Verde)</option>
+                        <option value="red">🔴 Crítico</option><option value="yellow">🟡 Advertencia</option><option value="green">🟢 Informativo</option>
                     </select>
                 </div>
                 <button class="btn" onclick="sendPushMessage()">Enviar Mensaje</button>
                 <button class="btn btn-danger" style="width: 100%; margin-top: 5px;" onclick="clearPushMessage()">Borrar Mensaje</button>
-                <div id="admin-push-status" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></div>
             </div>
-
             <div id="tab-playlist" class="tab-content">
                 <h2>Playlist Multimedia</h2>
-                <div class="form-group">
-                    <label>Subir Archivo (Imagen desde PC)</label>
-                    <input type="file" id="admin-media-file" accept="image/*" onchange="handleFileUpload(event)">
-                </div>
-                <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">- O ingresar URL -</p>
-                <div class="form-group"><label>URL de Imagen/Video</label><input type="text" id="admin-media-url" placeholder="https://..."></div>
-                <div class="form-group"><label>Duración (segundos)</label><input type="number" id="admin-media-time" value="10"></div>
+                <div class="form-group"><label>Subir Archivo</label><input type="file" id="admin-media-file" accept="image/*" onchange="handleFileUpload(event)"></div>
+                <div class="form-group"><label>URL</label><input type="text" id="admin-media-url" placeholder="https://..."></div>
+                <div class="form-group"><label>Duración (seg)</label><input type="number" id="admin-media-time" value="10"></div>
                 <button class="btn" onclick="addMedia()">Añadir a Playlist</button>
-                <div id="admin-media-list" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
+                <div id="admin-media-list" style="margin-top: 15px;"></div>
             </div>
-
             <div id="tab-services" class="tab-content">
                 <h2>Tipos de Servicio</h2>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Configura los servicios que aparecerán en el Kiosco.</p>
                 <div style="display: flex; gap: 10px;">
-                    <div class="form-group" style="flex:1;"><label>Nombre</label><input type="text" id="admin-srv-name" placeholder="Ej. Medicina General"></div>
-                    <div class="form-group" style="flex:1;"><label>Emoji</label><input type="text" id="admin-srv-emoji" placeholder="Ej. 🩺" style="font-size: 1.5rem;"></div>
+                    <div class="form-group" style="flex:1;"><label>Nombre</label><input type="text" id="admin-srv-name" placeholder="Ej. Medicina"></div>
+                    <div class="form-group" style="flex:1;"><label>Emoji</label><input type="text" id="admin-srv-emoji" placeholder="Ej. 🩺"></div>
                 </div>
                 <button class="btn" onclick="addService()">Agregar Servicio</button>
                 <div id="admin-srv-list" style="margin-top: 15px;"></div>
             </div>
-
             <div id="tab-rss" class="tab-content">
-                <h2>Configuración de Tickers RSS</h2>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">La suma de alturas no debe superar el 50% de la pantalla.</p>
+                <h2>Configuración de Tickers</h2>
                 <div id="rss-inputs"></div>
             </div>
         </div>
-
         <div class="admin-preview-area">
             <h2 style="margin-bottom: 10px;">Vista Previa TV</h2>
             <div class="tv-preview-container">
-                <div class="preview-grid" id="preview-grid">
+                <div class="preview-grid">
                     <div class="preview-video" id="preview-video">Sin Video</div>
                     <div class="preview-right">
                         <div style="background: var(--tv-bg); padding: 5px; text-align: right; font-size: 0.8rem;">10:45 AM</div>
@@ -291,37 +226,18 @@
         </div>
     </div>
 
-    <!-- MODAL AYUDA -->
-    <div id="help-modal" class="help-modal">
-        <div class="help-content">
-            <h3>Manual de Usuario</h3>
-            <p><strong>1. Admin:</strong> Crea operadores, envía mensajes push con semáforo, configura la playlist (sube imágenes de tu PC o pon URLs), crea los servicios para el Kiosco y configura los tickers RSS (color, velocidad, altura).</p>
-            <p><strong>2. Kiosco:</strong> El cliente digita su cédula (si ya existe, carga su nombre), escribe su nombre con el teclado gigante inferior y elige el servicio con los botones grandes. Luego recibe su turno.</p>
-            <p><strong>3. Operador:</strong> Entra con su PIN. Arrastra los paneles para organizarse. Haz clic en un turno de la derecha para escribirle notas en el panel izquierdo.</p>
-            <p><strong>4. Pantalla TV:</strong> Muestra el clima, reloj, el último turno (con nombre y consultorio) y la lista de recientes (en tamaño grande). Abajo rotan los tickers RSS.</p>
-            <p><em>Tip: Mantén presionada la esquina superior izquierda por 3 segundos para volver al menú.</em></p>
-            <button class="btn" onclick="toggleHelp()">Cerrar Manual</button>
-        </div>
-    </div>
-
-    <!-- 2. KIOSCO -->
     <div id="kiosco-screen" class="screen">
         <div class="kiosco-top">
             <div class="kiosco-box" id="kiosco-form">
                 <h1>Bienvenido</h1>
-                <p style="margin-bottom: 20px; font-size: 1.2rem; color: var(--text-muted);">Ingrese sus datos y seleccione el servicio</p>
-                
                 <div class="kiosco-input-group">
                     <input type="text" id="kiosco-cedula" class="kiosco-input" placeholder="Cédula" readonly>
-                    <input type="text" id="kiosco-nombre" class="kiosco-input" placeholder="Nombre Completo" readonly>
+                    <input type="text" id="kiosco-nombre" class="kiosco-input" placeholder="Nombre" readonly>
                 </div>
-                
                 <div class="services-grid" id="kiosco-services-container"></div>
-                
-                <button class="kiosco-btn" id="btn-kiosco-action" onclick="kioscoAction()">Registrar Turno</button>
+                <button class="kiosco-btn" onclick="kioscoAction()">Registrar Turno</button>
             </div>
         </div>
-
         <div id="virtual-keyboard">
             <div class="keyboard-row">
                 <div class="key" onclick="typeChar('1')">1</div><div class="key" onclick="typeChar('2')">2</div><div class="key" onclick="typeChar('3')">3</div><div class="key" onclick="typeChar('4')">4</div><div class="key" onclick="typeChar('5')">5</div><div class="key" onclick="typeChar('6')">6</div><div class="key" onclick="typeChar('7')">7</div><div class="key" onclick="typeChar('8')">8</div><div class="key" onclick="typeChar('9')">9</div><div class="key" onclick="typeChar('0')">0</div>
@@ -338,92 +254,60 @@
                 <div class="key special" onclick="deleteChar()">⌫ Borrar</div>
             </div>
         </div>
-        
         <div id="ticket-display">
-            <h2 style="color: #1565c0;">Su Turno es:</h2>
-            <h1 id="ticket-number">A001</h1>
-            <p style="font-size: 1.5rem; color: #1565c0; font-weight: bold;">Por favor espere en la sala</p>
+            <h2>Su Turno es:</h2><h1 id="ticket-number">A001</h1>
         </div>
     </div>
 
-    <!-- 3. OPERADOR -->
     <div id="operador-screen" class="screen">
-        <div class="operador-box" id="op-login" style="margin: auto; max-width: 500px; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+        <div class="operador-box" id="op-login" style="margin: auto; max-width: 500px; background: white; padding: 40px; border-radius: 15px;">
             <h1 style="color: var(--primary); margin-bottom: 20px; text-align: center;">Acceso Operador</h1>
             <input type="password" id="op-pin" class="kiosco-input" placeholder="Ingrese PIN">
             <button class="kiosco-btn" onclick="loginOperator()">Ingresar</button>
             <p id="op-error" style="color: #e53e3e; margin-top: 10px; font-weight: bold; text-align: center;"></p>
         </div>
-        
         <div id="op-panel" class="hidden" style="display: flex; gap: 20px; width: 100%; height: 100%;">
             <div class="op-panel op-main-panel" id="panel-main">
-                <div class="panel-header" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)">
-                    <h3>Llamar Turno</h3>
-                    <i class="fa-solid fa-grip-vertical drag-handle"></i>
-                </div>
+                <div class="panel-header"><h3>Llamar Turno</h3></div>
                 <div class="op-main-content">
                     <div id="op-push-zone"></div>
                     <div class="op-header">
                         <h1 id="op-welcome">Bienvenido</h1>
-                        <p>Atendiendo en: <strong id="op-box-name" style="color: var(--text-dark);"></strong></p>
+                        <p>Box: <strong id="op-box-name"></strong></p>
                     </div>
                     <select id="op-service-select" class="kiosco-input" style="font-size: 1.2rem; padding: 15px; margin-bottom: 20px;"></select>
-                    <button class="btn-next" onclick="callNext()">SIGUIENTE TURNO</button>
-                    <button class="btn btn-danger" style="width: 100%; padding: 15px; font-size: 1rem; margin-top: auto;" onclick="logoutOperator()">Cerrar Sesión</button>
+                    <button class="btn-next" onclick="callNext()">SIGUIENTE</button>
+                    <button class="btn btn-danger" style="width: 100%; padding: 15px;" onclick="logoutOperator()">Cerrar Sesión</button>
                 </div>
             </div>
-            
             <div class="op-panel op-side-panel" id="panel-history">
-                <div class="panel-header" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)">
-                    <h3>Historial Hoy</h3>
-                    <i class="fa-solid fa-grip-vertical drag-handle"></i>
-                </div>
-                <ul id="op-history-list">
-                    <li style="color: #a0aec0; text-align: center; border: none;">No has llamado turnos aún.</li>
-                </ul>
+                <div class="panel-header"><h3>Historial</h3></div>
+                <ul id="op-history-list"><li style="color: #a0aec0; text-align: center; border: none;">No has llamado turnos.</li></ul>
             </div>
-
             <div class="op-panel op-notes-panel" id="panel-notes">
-                <div class="panel-header" draggable="true" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)">
-                    <h3>Notas de Consulta</h3>
-                    <i class="fa-solid fa-grip-vertical drag-handle"></i>
-                </div>
+                <div class="panel-header"><h3>Notas</h3></div>
                 <div class="notes-content">
-                    <p class="notes-info" id="notes-info">Selecciona un turno del historial para escribir notas.</p>
-                    <textarea id="op-notes-area" class="notes-textarea" placeholder="Escribe aquí lo hablado con el paciente..." disabled></textarea>
+                    <p class="notes-info" id="notes-info">Selecciona un turno del historial.</p>
+                    <textarea id="op-notes-area" class="notes-textarea" disabled></textarea>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 4. PANTALLA CLIENTES (TV) -->
     <div id="pantalla-screen" class="screen">
         <div id="audio-overlay" style="position: fixed; top:0; left:0; right:0; bottom:0; background: white; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column;">
             <h1 style="color: var(--primary); margin-bottom: 20px;">Pantalla de Turnos</h1>
-            <button class="btn" style="font-size: 2rem; padding: 20px 40px; width: auto;" onclick="startScreen()">Iniciar Pantalla (Habilitar Audio)</button>
+            <button class="btn" style="font-size: 2rem; padding: 20px 40px; width: auto;" onclick="startScreen()">Iniciar Pantalla</button>
         </div>
-
         <div class="tv-grid" id="tv-grid">
-            <div class="tv-video-area" id="zona-video">
-                <div id="media-container" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000;"></div>
-            </div>
-
+            <div class="tv-video-area" id="zona-video"><div id="media-container" style="width: 100%; height: 100%;"></div></div>
             <div class="tv-right-col" id="zona-derecha">
                 <div class="tv-clock-area">
-                    <div class="weather-widget">
-                        <div class="weather-icon" id="weather-icon">☀️</div>
-                        <div class="weather-info">
-                            <div class="weather-temp" id="weather-temp">--°C</div>
-                            <div class="weather-desc" id="weather-desc">Cargando...</div>
-                        </div>
-                    </div>
-                    <div class="clock-widget">
-                        <h1 id="clock">10:45 AM</h1>
-                        <p id="date-display">MIÉRCOLES, 25 DE OCTUBRE</p>
-                    </div>
+                    <div class="weather-widget"><div class="weather-icon" id="weather-icon">☀️</div><div class="weather-temp" id="weather-temp">--°C</div></div>
+                    <div class="clock-widget"><h1 id="clock">10:45 AM</h1><p id="date-display">MIÉRCOLES</p></div>
                 </div>
                 <div class="tv-last-call">
-                    <div class="tv-green-bar">ÚLTIMO NÚMERO LLAMADO:</div>
+                    <div class="tv-green-bar">ÚLTIMO LLAMADO:</div>
                     <div class="tv-last-call-content">
                         <h2 id="last-turno-num">---</h2>
                         <div class="last-name" id="last-turno-name">---</div>
@@ -431,33 +315,22 @@
                     </div>
                 </div>
                 <div class="tv-recent-calls">
-                    <div class="tv-green-bar">LLAMADOS RECIENTES</div>
-                    <ul class="tv-recent-list" id="recent-list">
-                        <li><span>---</span> <span class="r-name">---</span> <span class="r-box">---</span></li>
-                    </ul>
+                    <div class="tv-green-bar">RECIENTES</div>
+                    <ul class="tv-recent-list" id="recent-list"><li><span>---</span> <span class="r-name">---</span> <span class="r-box">---</span></li></ul>
                 </div>
             </div>
-
             <div class="tv-rss-area" id="zona-rss"></div>
         </div>
-
         <div id="popup-turno">
             <div class="popup-card">
-                <h3>LLAMANDO AL TURNO</h3>
-                <h1 id="popup-num">A000</h1>
-                <h2 id="popup-name">Nombre Cliente</h2>
-                <p id="popup-box">CONSULTORIO 1</p>
+                <h3>LLAMANDO</h3><h1 id="popup-num">A000</h1><h2 id="popup-name">Nombre</h2><p id="popup-box">CONSULTORIO 1</p>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================================
-        // API.JS INTEGRADO CON FIX DE CORS
-        // ============================================================
         // ⚠️ REEMPLAZA ESTA URL CON LA DE TU GOOGLE APPS SCRIPT
         const API_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';
-
         let db = {};
 
         async function loadData() {
@@ -465,6 +338,7 @@
                 const response = await fetch(`${API_URL}?action=getAll`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
+                if(data.error) throw new Error(data.error);
                 
                 db = {
                     operators: data.operators || [],
@@ -480,66 +354,24 @@
                         showVideo: data.config?.showVideo !== undefined ? data.config.showVideo : true
                     }
                 };
-
-                // Defaults por si la hoja está vacía
                 if (db.operators.length === 0) db.operators = [{ name: 'Admin', pin: '1234', box: 'Box 1' }];
-                if (db.services.length === 0) {
-                    db.services = [
-                        { name: 'Medicina General', emoji: '🩺' },
-                        { name: 'Odontología', emoji: '🦷' },
-                        { name: 'Asesoría Comercial', emoji: '💼' }
-                    ];
-                }
-                if (db.rss.length === 0) {
-                    db.rss = [
-                        { active: true, type: 'text', content: 'Bienvenidos a Clínica Central', bgColor: '#0d47a1', textColor: '#ffffff', height: 10, speed: 20, direction: 'left' },
-                        { active: true, type: 'rss', content: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.eltiempo.com/rss/colombia.xml', bgColor: '#b71c1c', textColor: '#ffffff', height: 10, speed: 25, direction: 'left' },
-                        { active: false, type: 'text', content: 'Mantenga su distancia', bgColor: '#2e7d32', textColor: '#ffffff', height: 10, speed: 15, direction: 'right' }
-                    ];
-                }
+                if (db.services.length === 0) db.services = [{ name: 'Medicina', emoji: '🩺' }];
                 return db;
             } catch (error) {
-                console.warn('⚠️ Error al cargar datos de Sheets. Usando respaldo local:', error);
-                // Fallback silencioso
-                db = {
-                    operators: JSON.parse(localStorage.getItem('operators') || '[{"name":"Admin","pin":"1234","box":"Box 1"}]'),
-                    queue: JSON.parse(localStorage.getItem('queue') || '[]'),
-                    playlist: JSON.parse(localStorage.getItem('playlist') || '[]'),
-                    services: JSON.parse(localStorage.getItem('services') || '[]'),
-                    rss: JSON.parse(localStorage.getItem('rss') || '[]'),
-                    clients: JSON.parse(localStorage.getItem('clients') || '[]'),
-                    opHistory: JSON.parse(localStorage.getItem('opHistory') || '[]'),
-                    pushMessage: JSON.parse(localStorage.getItem('pushMessage') || '{"text":"","color":"red"}'),
-                    config: JSON.parse(localStorage.getItem('config') || '{"primaryColor":"#0056b3","showVideo":true}')
-                };
-                if (db.operators.length === 0) db.operators = [{ name: 'Admin', pin: '1234', box: 'Box 1' }];
-                return db;
+                // ALERTA VISIBLE PARA SABER SI FALLA LA LECTURA
+                alert("❌ Error al leer la base de datos: " + error.message);
+                console.error(error);
+                throw error;
             }
         }
 
         async function saveDB() {
-            // 1. Guardar en local primero
-            localStorage.setItem('operators', JSON.stringify(db.operators));
-            localStorage.setItem('queue', JSON.stringify(db.queue));
-            localStorage.setItem('playlist', JSON.stringify(db.playlist));
-            localStorage.setItem('services', JSON.stringify(db.services));
-            localStorage.setItem('rss', JSON.stringify(db.rss));
-            localStorage.setItem('clients', JSON.stringify(db.clients));
-            localStorage.setItem('opHistory', JSON.stringify(db.opHistory));
-            localStorage.setItem('pushMessage', JSON.stringify(db.pushMessage));
-            localStorage.setItem('config', JSON.stringify(db.config));
-
             try {
                 const payload = {
                     action: 'saveAll',
                     payload: {
-                        operators: db.operators,
-                        queue: db.queue,
-                        playlist: db.playlist,
-                        services: db.services,
-                        rss: db.rss,
-                        clients: db.clients,
-                        opHistory: db.opHistory,
+                        operators: db.operators, queue: db.queue, playlist: db.playlist,
+                        services: db.services, rss: db.rss, clients: db.clients, opHistory: db.opHistory,
                         config: {
                             primaryColor: db.config?.primaryColor || '#0056b3',
                             showVideo: db.config?.showVideo !== undefined ? db.config.showVideo : true,
@@ -548,49 +380,48 @@
                     }
                 };
                 
-                // Usamos no-cors y text/plain para evitar bloqueos de CORS
-                fetch(API_URL, {
+                // Usamos FormData para evitar el bloqueo de CORS en Apps Script
+                let formData = new FormData();
+                formData.append('payload', JSON.stringify(payload));
+
+                const response = await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                }).catch(e => console.log('Fetch no-cors ignorado:', e));
+                    body: formData
+                });
+
+                const result = await response.json();
+                if(result.error) throw new Error(result.error);
                 
-                console.log('✅ Datos enviados a Sheets');
+                console.log('✅ Guardado exitoso en Sheets');
             } catch (error) {
-                console.error('❌ Error guardando en Sheets:', error);
+                alert("❌ Error al guardar en Google Sheets: " + error.message);
+                console.error(error);
             }
         }
 
-        // ============================================================
-        // LÓGICA PRINCIPAL DE LA APP
-        // ============================================================
-        
         let holdTimer;
         function startHold() { holdTimer = setTimeout(() => { window.location.reload(); }, 3000); }
         function cancelHold() { clearTimeout(holdTimer); }
 
-        // Inicialización
         window.onload = async () => {
-            await loadData();
-            document.getElementById('loading-overlay').style.display = 'none';
-            renderAdmin(); 
+            try {
+                await loadData();
+                document.getElementById('loading-overlay').style.display = 'none';
+                renderAdmin(); 
+            } catch (e) {
+                document.getElementById('loading-overlay').innerHTML = "<div style='color:red;'>❌ Error de conexión.</div><p>Revisa que tu API_URL sea correcta y hayas desplegado la nueva versión en Apps Script.</p>";
+            }
         };
 
         function enterMode(mode) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(mode + '-screen').classList.add('active');
-            
             if(mode === 'admin') renderAdmin();
-            if(mode === 'pantalla') {
-                document.getElementById('pantalla-screen').style.display = 'flex';
-                applyVisualConfig();
-            }
+            if(mode === 'pantalla') { document.getElementById('pantalla-screen').style.display = 'flex'; applyVisualConfig(); }
             if(mode === 'kiosco') setupKiosco();
             if(mode === 'operador') setupOperator();
         }
 
-        // --- 1. ADMIN ---
         function openTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -598,312 +429,107 @@
             event.currentTarget.classList.add('active');
         }
 
-        function toggleHelp() {
-            const modal = document.getElementById('help-modal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        }
-
         function renderAdmin() {
             if(!db.operators) return;
-
             const opList = document.getElementById('admin-op-list');
-            opList.innerHTML = db.operators.map((op, index) => `
-                <div class="list-item">
-                    <span><strong>${op.name}</strong> (${op.box}) - PIN: ${op.pin}</span>
-                    <button class="btn-danger" onclick="removeOperator(${index})">X</button>
-                </div>
-            `).join('');
-
+            opList.innerHTML = db.operators.map((op, i) => `<div class="list-item"><span><strong>${op.name}</strong> (${op.box})</span><button class="btn-danger" onclick="removeOperator(${i})">X</button></div>`).join('');
             const mediaList = document.getElementById('admin-media-list');
-            mediaList.innerHTML = db.playlist.map((m, i) => `
-                <div class="list-item">
-                    <span style="font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">${m.url.substring(0, 30)}...</span>
-                    <span>${m.time}s</span>
-                    <button class="btn-danger" onclick="removeMedia(${i})">X</button>
-                </div>
-            `).join('');
-
+            mediaList.innerHTML = db.playlist.map((m, i) => `<div class="list-item"><span>${m.url.substring(0, 20)}...</span><button class="btn-danger" onclick="removeMedia(${i})">X</button></div>`).join('');
             const srvList = document.getElementById('admin-srv-list');
-            srvList.innerHTML = db.services.map((srv, i) => `
-                <div class="list-item">
-                    <span><strong>${srv.emoji} ${srv.name}</strong></span>
-                    <button class="btn-danger" onclick="removeService(${i})">X</button>
-                </div>
-            `).join('');
-
+            srvList.innerHTML = db.services.map((srv, i) => `<div class="list-item"><span>${srv.emoji} ${srv.name}</span><button class="btn-danger" onclick="removeService(${i})">X</button></div>`).join('');
+            
             document.getElementById('admin-push-msg').value = db.pushMessage.text;
             document.getElementById('admin-push-color').value = db.pushMessage.color;
             document.getElementById('toggle-video').checked = db.config.showVideo;
 
             const rssContainer = document.getElementById('rss-inputs');
             rssContainer.innerHTML = db.rss.map((feed, i) => `
-                <div style="background: #f7fafc; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <strong>Ticker ${i+1}</strong>
-                        <input type="checkbox" class="toggle-switch" ${feed.active ? 'checked' : ''} onchange="updateRSSConfig(${i}, 'active', this.checked)">
-                    </div>
-                    <div class="form-group" style="flex-direction: row; gap: 10px;">
-                        <div style="flex: 1;">
-                            <label>Tipo</label>
-                            <select onchange="updateRSSConfig(${i}, 'type', this.value)">
-                                <option value="text" ${feed.type === 'text' ? 'selected' : ''}>Texto</option>
-                                <option value="rss" ${feed.type === 'rss' ? 'selected' : ''}>RSS URL</option>
-                            </select>
-                        </div>
-                        <div style="flex: 2;"><label>Contenido / URL</label><input type="text" value="${feed.content}" oninput="updateRSSConfig(${i}, 'content', this.value)"></div>
-                    </div>
-                    <div class="form-group" style="flex-direction: row; gap: 10px;">
-                        <div style="flex: 1;"><label>Fondo</label><input type="color" value="${feed.bgColor}" onchange="updateRSSConfig(${i}, 'bgColor', this.value)"></div>
-                        <div style="flex: 1;"><label>Texto</label><input type="color" value="${feed.textColor}" onchange="updateRSSConfig(${i}, 'textColor', this.value)"></div>
-                        <div style="flex: 1;"><label>Altura (vh)</label><input type="number" value="${feed.height}" min="5" max="30" onchange="updateRSSConfig(${i}, 'height', parseInt(this.value))"></div>
-                    </div>
-                    <div class="form-group" style="flex-direction: row; gap: 10px; align-items: center;">
-                        <div style="flex: 1;"><label>Velocidad (seg)</label><input type="number" value="${feed.speed}" min="5" max="60" onchange="updateRSSConfig(${i}, 'speed', parseInt(this.value))"></div>
-                        <div style="flex: 1;"><label>Dirección</label>
-                            <select onchange="updateRSSConfig(${i}, 'direction', this.value)">
-                                <option value="left" ${feed.direction === 'left' ? 'selected' : ''}>Izq</option>
-                                <option value="right" ${feed.direction === 'right' ? 'selected' : ''}>Der</option>
-                            </select>
-                        </div>
-                    </div>
+                <div style="background: #f7fafc; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd;">
+                    <input type="checkbox" ${feed.active ? 'checked' : ''} onchange="updateRSSConfig(${i}, 'active', this.checked)"> Activo<br>
+                    <input type="text" value="${feed.content}" oninput="updateRSSConfig(${i}, 'content', this.value)" style="width:100%; margin: 5px 0;"><br>
+                    Fondo: <input type="color" value="${feed.bgColor}" onchange="updateRSSConfig(${i}, 'bgColor', this.value)">
+                    Altura: <input type="number" value="${feed.height}" onchange="updateRSSConfig(${i}, 'height', parseInt(this.value))" style="width: 50px;">
                 </div>
             `).join('');
-            
             updatePreview();
         }
 
-        function updateRSSConfig(index, key, value) {
-            if (key === 'height' || key === 'active') {
-                let totalHeight = 0;
-                db.rss.forEach((f, i) => {
-                    if (i === index && key === 'height') totalHeight += value;
-                    else if (f.active && i !== index) totalHeight += f.height;
-                });
-                if (totalHeight > 50) {
-                    alert("La suma de las alturas activas no puede superar 50vh.");
-                    renderAdmin();
-                    return;
-                }
-            }
-            db.rss[index][key] = value;
-            saveDB();
-            updatePreview();
-        }
-
+        function updateRSSConfig(i, k, v) { db.rss[i][k] = v; saveDB(); updatePreview(); }
         function updatePreview() {
-            const prevTicker = document.getElementById('preview-ticker');
-            prevTicker.innerHTML = '';
-            db.rss.forEach(feed => {
-                if(feed.active) {
-                    const div = document.createElement('div');
-                    div.style.backgroundColor = feed.bgColor;
-                    div.style.color = feed.textColor;
-                    div.style.height = `${feed.height}%`; 
-                    div.style.fontSize = `${feed.height * 0.4}px`; 
-                    div.style.overflow = 'hidden';
-                    div.style.whiteSpace = 'nowrap';
-                    div.style.padding = '2px 5px';
-                    div.innerText = feed.type === 'text' ? feed.content : 'Noticias RSS...';
-                    prevTicker.appendChild(div);
-                }
-            });
-            
-            const prevVid = document.getElementById('preview-video');
-            if(db.config.showVideo && db.playlist.length > 0) {
-                prevVid.style.display = 'flex';
-                const media = db.playlist[0];
-                if(media.url.match(/\.(jpeg|jpg|gif|png)$/) || media.url.startsWith('data:image')) {
-                    prevVid.innerHTML = `<img src="${media.url}">`;
-                } else {
-                    prevVid.innerHTML = `<div style="color:#fff;">Video</div>`;
-                }
-            } else {
-                prevVid.style.display = 'none';
-            }
-        }
-
-        function sendPushMessage() {
-            const msg = document.getElementById('admin-push-msg').value;
-            const color = document.getElementById('admin-push-color').value;
-            db.pushMessage = { text: msg, color: color };
-            saveDB();
-            document.getElementById('admin-push-status').innerText = msg ? "Mensaje enviado." : "Mensaje borrado.";
-            document.getElementById('admin-push-status').style.color = msg ? "#38a169" : "#e53e3e";
-        }
-
-        function clearPushMessage() {
-            db.pushMessage = { text: "", color: "red" };
-            document.getElementById('admin-push-msg').value = "";
-            saveDB();
-            document.getElementById('admin-push-status').innerText = "Mensaje borrado.";
-            document.getElementById('admin-push-status').style.color = "#e53e3e";
+            document.getElementById('preview-ticker').innerHTML = db.rss.filter(f => f.active).map(f => `<div style="background:${f.bgColor}; height:${f.height}%; font-size:${f.height*0.4}px;">${f.content}</div>`).join('');
         }
 
         function addOperator() {
             const name = document.getElementById('admin-op-name').value;
             const pin = document.getElementById('admin-op-pin').value;
             const box = document.getElementById('admin-op-box').value;
-            if(name && pin && box) {
-                db.operators.push({ name, pin, box });
-                saveDB(); renderAdmin();
-                document.getElementById('admin-op-name').value = '';
-                document.getElementById('admin-op-pin').value = '';
-                document.getElementById('admin-op-box').value = '';
-            }
+            if(name && pin && box) { db.operators.push({ name, pin, box }); saveDB(); renderAdmin(); }
         }
-        function removeOperator(index) { db.operators.splice(index, 1); saveDB(); renderAdmin(); }
-
+        function removeOperator(i) { db.operators.splice(i, 1); saveDB(); renderAdmin(); }
         function addService() {
             const name = document.getElementById('admin-srv-name').value;
             const emoji = document.getElementById('admin-srv-emoji').value || '🏥';
-            if(name) {
-                db.services.push({ name, emoji });
-                saveDB(); renderAdmin();
-                document.getElementById('admin-srv-name').value = '';
-                document.getElementById('admin-srv-emoji').value = '';
-            }
+            if(name) { db.services.push({ name, emoji }); saveDB(); renderAdmin(); }
         }
-        function removeService(index) { db.services.splice(index, 1); saveDB(); renderAdmin(); }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (file.size > 500 * 1024) {
-                alert("La imagen es muy pesada (máx 500KB). Intenta con una más pequeña o usa URL.");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('admin-media-url').value = e.target.result;
-                alert("Imagen cargada. Dale a 'Añadir a Playlist'.");
-            };
-            reader.readAsDataURL(file);
-        }
-
+        function removeService(i) { db.services.splice(i, 1); saveDB(); renderAdmin(); }
         function addMedia() {
             const url = document.getElementById('admin-media-url').value;
             const time = document.getElementById('admin-media-time').value;
-            if(url && time) {
-                db.playlist.push({ url, time: parseInt(time) });
-                saveDB(); renderAdmin();
-                document.getElementById('admin-media-url').value = '';
-            }
+            if(url && time) { db.playlist.push({ url, time: parseInt(time) }); saveDB(); renderAdmin(); }
         }
-        function removeMedia(index) { db.playlist.splice(index, 1); saveDB(); renderAdmin(); }
-        
-        function saveConfig() {
-            db.config.showVideo = document.getElementById('toggle-video').checked;
-            saveDB();
-            updatePreview();
+        function removeMedia(i) { db.playlist.splice(i, 1); saveDB(); renderAdmin(); }
+        function sendPushMessage() { db.pushMessage = { text: document.getElementById('admin-push-msg').value, color: document.getElementById('admin-push-color').value }; saveDB(); }
+        function clearPushMessage() { db.pushMessage = { text: "", color: "red" }; document.getElementById('admin-push-msg').value = ""; saveDB(); }
+        function saveConfig() { db.config.showVideo = document.getElementById('toggle-video').checked; saveDB(); updatePreview(); }
+        function handleFileUpload(e) {
+            const reader = new FileReader();
+            reader.onload = ev => document.getElementById('admin-media-url').value = ev.target.result;
+            reader.readAsDataURL(e.target.files[0]);
         }
 
-        // --- 2. KIOSCO ---
-        let activeInput = null;
-        let selectedService = null;
-
+        let activeInput = null, selectedService = null;
         function setupKiosco() {
-            const srvContainer = document.getElementById('kiosco-services-container');
-            srvContainer.innerHTML = db.services.map((srv, i) => `
-                <button class="service-btn" onclick="selectService(${i}, this)">
-                    <span class="service-emoji">${srv.emoji}</span>
-                    <span>${srv.name}</span>
-                </button>
-            `).join('');
-
-            const cedulaInput = document.getElementById('kiosco-cedula');
-            const nombreInput = document.getElementById('kiosco-nombre');
-            
-            cedulaInput.addEventListener('focus', () => { activeInput = cedulaInput; });
-            cedulaInput.addEventListener('input', () => {
-                const client = db.clients.find(c => c.cedula === cedulaInput.value);
-                if(client) nombreInput.value = client.nombre;
+            document.getElementById('kiosco-services-container').innerHTML = db.services.map((s, i) => `<button class="service-btn" onclick="selectService(${i}, this)"><span class="service-emoji">${s.emoji}</span>${s.name}</button>`).join('');
+            document.getElementById('kiosco-cedula').addEventListener('focus', () => activeInput = document.getElementById('kiosco-cedula'));
+            document.getElementById('kiosco-cedula').addEventListener('input', () => {
+                const c = db.clients.find(x => x.cedula === document.getElementById('kiosco-cedula').value);
+                if(c) document.getElementById('kiosco-nombre').value = c.nombre;
             });
-            nombreInput.addEventListener('focus', () => { activeInput = nombreInput; });
+            document.getElementById('kiosco-nombre').addEventListener('focus', () => activeInput = document.getElementById('kiosco-nombre'));
         }
-
-        function selectService(index, btn) {
+        function selectService(i, btn) {
             document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            selectedService = db.services[index].name;
+            btn.classList.add('selected'); selectedService = db.services[i].name;
         }
-
-        function typeChar(char) {
-            if(activeInput) { activeInput.value += char; activeInput.dispatchEvent(new Event('input')); }
-        }
-        function deleteChar() {
-            if(activeInput) { activeInput.value = activeInput.value.slice(0, -1); activeInput.dispatchEvent(new Event('input')); }
-        }
-
+        function typeChar(c) { if(activeInput) { activeInput.value += c; activeInput.dispatchEvent(new Event('input')); } }
+        function deleteChar() { if(activeInput) activeInput.value = activeInput.value.slice(0, -1); }
+        
         function kioscoAction() {
             const cedula = document.getElementById('kiosco-cedula').value;
             const nombre = document.getElementById('kiosco-nombre').value;
+            if(!cedula || !nombre || !selectedService) return alert("Complete todos los datos");
             
-            if(!cedula) return alert("Ingrese cédula");
-            if(!nombre) return alert("Ingrese nombre");
-            if(!selectedService) return alert("Seleccione un servicio");
-
-            if(!db.clients.find(c => c.cedula === cedula)) {
-                db.clients.push({ cedula, nombre });
-            }
-
-            const prefix = selectedService === 'Medicina General' ? 'M' : (selectedService === 'Odontología' ? 'O' : 'A');
-            const turnoNum = prefix + String(db.queue.length + 1).padStart(3, '0');
-            
+            if(!db.clients.find(c => c.cedula === cedula)) db.clients.push({ cedula, nombre });
+            const turnoNum = 'A' + String(db.queue.length + 1).padStart(3, '0');
             db.queue.push({ cedula, nombre, servicio: selectedService, turno: turnoNum, timestamp: Date.now() });
             saveDB();
 
             document.getElementById('kiosco-form').style.display = 'none';
-            document.getElementById('virtual-keyboard').style.display = 'none';
-            const ticket = document.getElementById('ticket-display');
-            ticket.style.display = 'block';
+            document.getElementById('ticket-display').style.display = 'block';
             document.getElementById('ticket-number').innerText = turnoNum;
-
             setTimeout(() => {
-                ticket.style.display = 'none';
+                document.getElementById('ticket-display').style.display = 'none';
                 document.getElementById('kiosco-form').style.display = 'block';
-                document.getElementById('virtual-keyboard').style.display = 'flex';
                 document.getElementById('kiosco-cedula').value = '';
                 document.getElementById('kiosco-nombre').value = '';
-                document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('selected'));
                 selectedService = null;
-                activeInput = null;
             }, 5000);
         }
 
-        // --- 3. OPERADOR ---
-        let currentOperator = null;
-        let opInterval;
-        let selectedHistoryId = null;
-
+        let currentOperator = null, selectedHistoryId = null;
         function setupOperator() {
-            const select = document.getElementById('op-service-select');
-            select.innerHTML = db.services.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
-
-            if(opInterval) clearInterval(opInterval);
-            opInterval = setInterval(async () => {
-                try {
-                    const data = await loadData(); 
-                    if(JSON.stringify(data.pushMessage) !== JSON.stringify(db.pushMessage)) {
-                        db.pushMessage = data.pushMessage;
-                        renderPushMessage();
-                    }
-                } catch(e) {}
-            }, 5000); 
+            document.getElementById('op-service-select').innerHTML = db.services.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
         }
-
-        function renderPushMessage() {
-            const zone = document.getElementById('op-push-zone');
-            if(db.pushMessage && db.pushMessage.text.trim() !== "") {
-                zone.innerText = "⚠️ " + db.pushMessage.text;
-                zone.style.display = 'block';
-                if(db.pushMessage.color === 'red') { zone.style.background = '#fff5f5'; zone.style.color = '#c53030'; zone.style.borderColor = '#fc8181'; }
-                if(db.pushMessage.color === 'yellow') { zone.style.background = '#fffff0'; zone.style.color = '#b7791f'; zone.style.borderColor = '#f6e05e'; }
-                if(db.pushMessage.color === 'green') { zone.style.background = '#f0fff4'; zone.style.color = '#2f855a'; zone.style.borderColor = '#9ae6b4'; }
-            } else {
-                zone.style.display = 'none';
-            }
-        }
-
         function loginOperator() {
             const pin = document.getElementById('op-pin').value;
             const op = db.operators.find(o => o.pin === pin);
@@ -913,307 +539,91 @@
                 document.getElementById('op-panel').classList.remove('hidden');
                 document.getElementById('op-welcome').innerText = "Hola, " + op.name;
                 document.getElementById('op-box-name').innerText = op.box;
-                renderPushMessage();
                 renderOperatorHistory();
-            } else {
-                document.getElementById('op-error').innerText = "PIN Incorrecto";
-            }
+            } else alert("PIN Incorrecto");
         }
-
-        function logoutOperator() {
-            currentOperator = null;
-            document.getElementById('op-pin').value = '';
-            document.getElementById('op-login').classList.remove('hidden');
-            document.getElementById('op-panel').classList.add('hidden');
-            selectedHistoryId = null;
-            document.getElementById('op-notes-area').value = '';
-            document.getElementById('op-notes-area').disabled = true;
-            document.getElementById('notes-info').innerText = "Selecciona un turno del historial para escribir notas.";
-        }
-
+        function logoutOperator() { location.reload(); }
         function renderOperatorHistory() {
-            const list = document.getElementById('op-history-list');
-            const myHistory = db.opHistory.filter(h => h.pin === currentOperator.pin);
-            
-            if(myHistory.length === 0) {
-                list.innerHTML = `<li style="color: #a0aec0; text-align: center; border: none;">No has llamado turnos aún.</li>`;
-                return;
-            }
-
-            list.innerHTML = myHistory.map(h => `
-                <li onclick="selectHistory(${h.id})" class="${selectedHistoryId === h.id ? 'active' : ''}">
-                    <div class="hist-header">
-                        <span>${h.turno}</span>
-                        <span style="color: #a0aec0; font-size: 0.8rem;">${h.time}</span>
-                    </div>
-                    <div class="hist-name">${h.name}</div>
-                </li>
-            `).join('');
+            const hist = db.opHistory.filter(h => h.pin === currentOperator.pin);
+            document.getElementById('op-history-list').innerHTML = hist.length ? hist.map(h => `<li onclick="selectHistory(${h.id})"><b>${h.turno}</b> - ${h.name}</li>`).join('') : '<li>Sin turnos</li>';
         }
-
         function selectHistory(id) {
             selectedHistoryId = id;
-            renderOperatorHistory();
             const item = db.opHistory.find(h => h.id === id);
-            if(item) {
-                document.getElementById('op-notes-area').value = item.notes || '';
-                document.getElementById('op-notes-area').disabled = false;
-                document.getElementById('notes-info').innerText = `Escribiendo nota para: ${item.name} (${item.turno})`;
-                document.getElementById('op-notes-area').focus();
-            }
+            document.getElementById('op-notes-area').value = item.notes || '';
+            document.getElementById('op-notes-area').disabled = false;
         }
-
-        document.addEventListener('input', (e) => {
-            if(e.target.id === 'op-notes-area' && selectedHistoryId !== null) {
-                const item = db.opHistory.find(h => h.id === selectedHistoryId);
-                if(item) { item.notes = e.target.value; saveDB(); }
-            }
+        document.getElementById('op-notes-area')?.addEventListener('input', e => {
+            if(selectedHistoryId) { db.opHistory.find(h => h.id === selectedHistoryId).notes = e.target.value; saveDB(); }
         });
-
         function callNext() {
             const servicio = document.getElementById('op-service-select').value;
             const nextIndex = db.queue.findIndex(u => u.servicio === servicio);
+            if(nextIndex === -1) return alert("No hay turnos para: " + servicio);
             
-            if(nextIndex === -1) return alert("No hay turnos pendientes para: " + servicio);
-
             const user = db.queue.splice(nextIndex, 1)[0];
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
             db.activeCall = { turno: user.turno, nombre: user.nombre, box: currentOperator.box, timestamp: Date.now() };
-
-            const historyId = Date.now();
-            db.opHistory.push({ id: historyId, pin: currentOperator.pin, turno: user.turno, name: user.nombre, time: timeString, notes: "" });
-            
+            const id = Date.now();
+            db.opHistory.push({ id, pin: currentOperator.pin, turno: user.turno, name: user.nombre, time: "Ahora", notes: "" });
             saveDB();
-            selectedHistoryId = historyId;
             renderOperatorHistory();
-            selectHistory(historyId);
         }
 
-        // Drag & Drop Operador
-        let draggedPanel = null;
-        function dragStart(e) { draggedPanel = e.target.closest('.op-panel'); e.dataTransfer.effectAllowed = 'move'; }
-        function dragOver(e) { e.preventDefault(); const targetPanel = e.target.closest('.op-panel'); if (targetPanel && targetPanel !== draggedPanel) targetPanel.classList.add('drag-over'); }
-        function drop(e) {
-            e.preventDefault();
-            const targetPanel = e.target.closest('.op-panel');
-            if (targetPanel && targetPanel !== draggedPanel) {
-                targetPanel.classList.remove('drag-over');
-                const container = document.getElementById('op-panel');
-                const panels = [...container.children];
-                const draggedIndex = panels.indexOf(draggedPanel);
-                const targetIndex = panels.indexOf(targetPanel);
-                if (draggedIndex < targetIndex) targetPanel.after(draggedPanel);
-                else targetPanel.before(draggedPanel);
-            }
-            document.querySelectorAll('.op-panel').forEach(p => p.classList.remove('drag-over'));
-        }
-
-        // --- 4. PANTALLA CLIENTES (TV) ---
-        let screenInterval, audioEnabled = false, currentMediaIndex = 0, mediaTimer, isCalling = false;
-
+        let audioEnabled = false, isCalling = false;
         function startScreen() {
             audioEnabled = true;
             document.getElementById('audio-overlay').style.display = 'none';
-            
-            applyVisualConfig();
-            initScreenListeners();
-            startPlaylist();
-            renderTVRSS();
-            fetchWeather();
+            applyVisualConfig(); initScreenListeners(); startPlaylist(); renderTVRSS(); fetchWeather();
         }
-
         function applyVisualConfig() {
-            const zonaVideo = document.getElementById('zona-video');
-            const zonaDerecha = document.getElementById('zona-derecha');
-            const tvGrid = document.getElementById('tv-grid');
-
-            if (db.config.showVideo) {
-                zonaVideo.style.display = 'flex';
-                tvGrid.style.gridTemplateColumns = '2.2fr 1fr';
-            } else {
-                zonaVideo.style.display = 'none';
-                tvGrid.style.gridTemplateColumns = '1fr';
-            }
+            document.getElementById('zona-video').style.display = db.config.showVideo ? 'flex' : 'none';
+            document.getElementById('tv-grid').style.gridTemplateColumns = db.config.showVideo ? '2.2fr 1fr' : '1fr';
         }
-
         function startPlaylist() {
-            if (db.playlist.length === 0) return;
-
-            function showNextMedia() {
-                if (isCalling) return;
+            if(!db.playlist.length) return;
+            function showNext() {
+                if(isCalling) return;
                 const container = document.getElementById('media-container');
-                const media = db.playlist[currentMediaIndex];
-                container.innerHTML = '';
-
-                if (media.url.includes('youtube.com') || media.url.includes('youtu.be')) {
-                    const videoId = media.url.split('v=')[1] || media.url.split('/').pop();
-                    container.innerHTML = `<iframe class="media-content" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
-                } else if (media.url.match(/\.(jpeg|jpg|gif|png)$/) || media.url.startsWith('data:image')) {
-                    container.innerHTML = `<img src="${media.url}" class="media-content">`;
-                } else {
-                    container.innerHTML = `<video src="${media.url}" class="media-content" autoplay muted loop></video>`;
-                }
-
-                mediaTimer = setTimeout(() => {
-                    currentMediaIndex = (currentMediaIndex + 1) % db.playlist.length;
-                    showNextMedia();
-                }, media.time * 1000);
+                const media = db.playlist[0];
+                container.innerHTML = media.url.includes('youtube') ? `<iframe src="${media.url}" width="100%" height="100%"></iframe>` : `<img src="${media.url}" class="media-content">`;
+                setTimeout(showNext, media.time * 1000);
             }
-            showNextMedia();
+            showNext();
         }
-
         async function fetchWeather() {
             try {
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=4.60&longitude=-74.08&current_weather=true');
                 const data = await res.json();
-                const temp = Math.round(data.current_weather.temperature);
-                const code = data.current_weather.weathercode;
-                const hour = new Date().getHours();
-                const isNight = hour < 6 || hour >= 18;
-                
-                document.getElementById('weather-temp').innerText = `${temp}°C`;
-                
-                let icon = isNight ? '🌙' : '☀️'; let desc = isNight ? 'Despejado' : 'Soleado';
-                if(code > 0 && code <= 3) { icon = '⛅'; desc = 'Parcial'; }
-                if(code >= 45 && code <= 48) { icon = '🌫️'; desc = 'Niebla'; }
-                if(code >= 51 && code <= 67) { icon = '🌧️'; desc = 'Lluvia'; }
-                if(code >= 71 && code <= 77) { icon = '❄️'; desc = 'Nieve'; }
-                if(code >= 80 && code <= 82) { icon = '🌦️'; desc = 'Chubascos'; }
-                if(code >= 95) { icon = '⛈️'; desc = 'Tormenta'; }
-
-                document.getElementById('weather-icon').innerText = icon;
-                document.getElementById('weather-desc').innerText = desc;
-            } catch(e) {
-                document.getElementById('weather-desc').innerText = "No disp.";
-            }
+                document.getElementById('weather-temp').innerText = Math.round(data.current_weather.temperature) + '°C';
+            } catch(e) {}
         }
-
-        async function renderTVRSS() {
-            const rssArea = document.getElementById('zona-rss');
-            rssArea.innerHTML = '';
-            
-            const activeFeeds = db.rss.filter(f => f.active);
-            if (activeFeeds.length === 0) {
-                rssArea.style.display = 'none';
-                document.getElementById('tv-grid').style.gridTemplateRows = '1fr';
-                return;
-            }
-
-            rssArea.style.display = 'flex';
-            let totalHeight = 0;
-            activeFeeds.forEach(f => totalHeight += f.height);
-            document.getElementById('tv-grid').style.gridTemplateRows = `1fr ${totalHeight}vh`;
-
-            for (let i = 0; i < db.rss.length; i++) {
-                const feed = db.rss[i];
-                if (!feed.active) continue;
-
-                const lineDiv = document.createElement('div');
-                lineDiv.className = 'rss-line';
-                lineDiv.style.backgroundColor = feed.bgColor;
-                lineDiv.style.color = feed.textColor;
-                lineDiv.style.height = `${feed.height}vh`;
-                
-                const textSpan = document.createElement('span');
-                textSpan.className = 'rss-text';
-                textSpan.style.fontSize = `${feed.height * 0.4}vh`;
-                textSpan.style.animationDirection = feed.direction === 'right' ? 'reverse' : 'normal';
-                textSpan.style.animationDuration = `${feed.speed}s`;
-                
-                let contentText = feed.content;
-                if(feed.type === 'rss') {
-                    textSpan.innerText = "Cargando noticias...";
-                    lineDiv.appendChild(textSpan);
-                    rssArea.appendChild(lineDiv);
-                    try {
-                        const res = await fetch(feed.content);
-                        const data = await res.json();
-                        if(data.items && data.items.length > 0) {
-                            contentText = data.items.map(item => item.title).join('  •  ');
-                        } else {
-                            contentText = "No hay noticias en este feed.";
-                        }
-                    } catch(e) { contentText = "Error al cargar el RSS."; }
-                    textSpan.innerText = contentText;
-                } else {
-                    textSpan.innerText = contentText;
-                    lineDiv.appendChild(textSpan);
-                    rssArea.appendChild(lineDiv);
-                }
-            }
+        function renderTVRSS() {
+            document.getElementById('zona-rss').innerHTML = db.rss.filter(f => f.active).map(f => `<div class="rss-line" style="background:${f.bgColor}; color:${f.textColor}; height:${f.height}vh;"><div class="rss-text" style="font-size:${f.height*0.4}vh; animation-duration:${f.speed}s;">${f.content}</div></div>`).join('');
         }
-
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = `@keyframes marquee-left { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }`;
-        document.head.appendChild(styleSheet);
-
         function initScreenListeners() {
-            if(screenInterval) clearInterval(screenInterval);
-            updateClock();
-            setInterval(updateClock, 1000);
-            screenInterval = setInterval(checkCalls, 4000); 
-            
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('date-display').innerText = new Date().toLocaleDateString('es-ES', options).toUpperCase();
+            setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), 1000);
+            setInterval(async () => {
+                try {
+                    const res = await fetch(`${API_URL}?action=getAll`);
+                    const data = await res.json();
+                    if(data.activeCall && data.activeCall.timestamp > (window.lastCall || 0)) {
+                        window.lastCall = data.activeCall.timestamp;
+                        processNewCall(data.activeCall);
+                    }
+                } catch(e) {}
+            }, 4000);
         }
-
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }
-
-        let lastProcessedCall = 0;
-        async function checkCalls() {
-            try {
-                const response = await fetch(`${API_URL}?action=getAll`);
-                const data = await response.json();
-                const newActiveCall = data.activeCall;
-                
-                if(newActiveCall && newActiveCall.timestamp > lastProcessedCall) {
-                    lastProcessedCall = newActiveCall.timestamp;
-                    processNewCall(newActiveCall);
-                }
-            } catch(e) {
-                console.log("Polling error", e);
-            }
-        }
-
         function processNewCall(call) {
             isCalling = true;
-            clearTimeout(mediaTimer);
-
-            document.getElementById('last-turno-num').innerText = call.turno;
-            document.getElementById('last-turno-name').innerText = call.nombre;
-            document.getElementById('last-turno-box').innerText = call.box.toUpperCase();
-            
-            const list = document.getElementById('recent-list');
-            const newLi = document.createElement('li');
-            newLi.innerHTML = `<span>${call.turno}</span> <span class="r-name">${call.nombre}</span> <span class="r-box">${call.box.toUpperCase()}</span>`;
-            list.insertBefore(newLi, list.firstChild);
-            if(list.children.length > 4) list.removeChild(list.lastChild);
-
-            const popup = document.getElementById('popup-turno');
+            document.getElementById('popup-turno').style.display = 'flex';
             document.getElementById('popup-num').innerText = call.turno;
             document.getElementById('popup-name').innerText = call.nombre;
-            document.getElementById('popup-box').innerText = call.box.toUpperCase();
-            popup.style.display = 'flex';
-
-            if(audioEnabled && 'speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const text = `Turno ${call.turno.split('').join(' ')}, ${call.nombre}, pasar a ${call.box}`;
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-ES';
-                utterance.rate = 0.85;
-                window.speechSynthesis.speak(utterance);
+            document.getElementById('popup-box').innerText = call.box;
+            if(audioEnabled) {
+                const u = new SpeechSynthesisUtterance(`Turno ${call.turno}, ${call.nombre}, ${call.box}`);
+                u.lang = 'es-ES'; speechSynthesis.speak(u);
             }
-
-            setTimeout(() => {
-                popup.style.display = 'none';
-                isCalling = false;
-                if(db.playlist.length > 0) startPlaylist();
-            }, 8000);
+            setTimeout(() => { document.getElementById('popup-turno').style.display = 'none'; isCalling = false; }, 8000);
         }
     </script>
 </body>
