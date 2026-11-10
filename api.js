@@ -7,6 +7,8 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycby2l-J5soheP4RXRrSwuP0ymBOR_0ZQa61aUndXcshu4q8xrT-kGU6aYCAp9UXOiHeA/exec';
 
 
+
+
 // Variable global donde se almacenarán los datos (similar a "db" en el HTML)
 let db = {};
 
