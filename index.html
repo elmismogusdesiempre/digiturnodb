@@ -520,110 +520,12 @@
         </div>
     </div>
 
+    <script src="api.js"></script>
     <script>
-        // ⚠️ REEMPLAZA ESTA URL CON LA DE TU GOOGLE APPS SCRIPT (/exec)
-        const API_URL = 'https://script.google.com/macros/s/AKfycby2l-J5soheP4RXRrSwuP0ymBOR_0ZQa61aUndXcshu4q8xrT-kGU6aYCAp9UXOiHeA/exec';
-
-        // Variables de estado
-        let db = {};
+        // (db, loadData, refreshLive, saveDB y las acciones vienen de api.js)
         let holdTimer;
-        
         function startHold() { holdTimer = setTimeout(() => { window.location.reload(); }, 3000); }
         function cancelHold() { clearTimeout(holdTimer); }
-
-        // ---- CAPA DE CONEXIÓN CON GOOGLE SHEETS ----
-        async function loadData() {
-            try {
-                const res = await fetch(`${API_URL}?action=getAll`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-
-                db = {
-                    operators: data.operators || [],
-                    queue: data.queue || [],
-                    playlist: data.playlist || [],
-                    services: data.services || [],
-                    rss: normRSS(data.rss || []),
-                    clients: data.clients || [],
-                    opHistory: data.opHistory || [],
-                    pushMessage: data.pushMessage || { text: '', color: 'red' },
-                    config: {
-                        primaryColor: data.config?.primaryColor || '#0056b3',
-                        showVideo: data.config?.showVideo !== undefined ? data.config.showVideo : true,
-                        logo: data.config?.logo ? JSON.parse(data.config.logo) : null
-                    },
-                    activeCall: data.config?.activeCall ? JSON.parse(data.config.activeCall) : null
-                };
-                
-                // Defaults si la DB está vacía
-                if (db.operators.length === 0) db.operators = [{ name: 'Admin', pin: '1234', box: 'Box 1' }];
-                if (db.services.length === 0) db.services = [{ name: 'Medicina General', emoji: '🩺' }, { name: 'Odontología', emoji: '🦷' }, { name: 'Asesoría Comercial', emoji: '💼' }];
-                if (db.rss.length === 0) db.rss = normRSS([
-                    { active: true, type: 'text', content: 'Bienvenidos a Clínica Central', bgColor: '#0d47a1', textColor: '#ffffff', height: 10, speed: 20, direction: 'left' },
-                    { active: true, type: 'rss', content: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.eltiempo.com/rss/colombia.xml', bgColor: '#b71c1c', textColor: '#ffffff', height: 10, speed: 25, direction: 'left' }
-                ]);
-                if (db.playlist.length === 0) db.playlist = [{ url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80', time: 5 }];
-
-                // Guardar copia local por si falla la red después
-                localStorage.setItem('offline_db', JSON.stringify(db));
-            } catch (err) {
-                console.warn("⚠️ Error de conexión con Sheets. Usando respaldo local.", err);
-                const offline = localStorage.getItem('offline_db');
-                if(offline) db = JSON.parse(offline);
-                else {
-                    db = {
-                        operators: [{ name: 'Admin', pin: '1234', box: 'Box 1' }],
-                        queue: [], playlist: [], opHistory: [], clients: [],
-                        services: [{ name: 'Medicina General', emoji: '🩺' }],
-                        rss: [], pushMessage: { text: '', color: 'red' }, config: { showVideo: true },
-                        activeCall: null
-                    };
-                }
-            }
-        }
-
-        async function saveDB() {
-            // Guardar en local primero
-            localStorage.setItem('offline_db', JSON.stringify(db));
-
-            try {
-                const payload = {
-                    action: 'saveAll',
-                    payload: {
-                        operators: db.operators,
-                        queue: db.queue,
-                        playlist: db.playlist,
-                        services: db.services,
-                        rss: db.rss,
-                        clients: db.clients,
-                        opHistory: db.opHistory,
-                        config: {
-                            primaryColor: db.config?.primaryColor || '#0056b3',
-                            showVideo: db.config?.showVideo !== undefined ? db.config.showVideo : true,
-                            logo: db.config?.logo ? JSON.stringify(db.config.logo) : null,
-                            pushMessage: JSON.stringify(db.pushMessage || { text: '', color: 'red' }),
-                            activeCall: db.activeCall ? JSON.stringify(db.activeCall) : null
-                        }
-                    }
-                };
-
-                // Usamos FormData para evitar bloqueos CORS en Google Apps Script
-                let formData = new FormData();
-                formData.append('payload', JSON.stringify(payload));
-
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await res.json();
-                if(result.error) throw new Error(result.error);
-                console.log("✅ Guardado en Sheets");
-            } catch (err) {
-                console.error("❌ Error guardando en Sheets:", err);
-            }
-        }
 
         // ---- UTILIDADES ----
         const UNIT = 2.5, MAXVH = 50, PX = 10.8;
@@ -888,26 +790,24 @@
             fitPreview();
         }
 
-        function sendPushMessage() {
+        async function sendPushMessage() {
             const msg = document.getElementById('admin-push-msg').value;
             const color = document.getElementById('admin-push-color').value;
+            const st = document.getElementById('admin-push-status');
             db.pushMessage = { text: msg, color: color };
-            if (msg.trim()) {
-                const log = JSON.parse(localStorage.getItem('msgLog') || '[]');
-                log.push({ id: Date.now(), text: msg.trim(), color, ts: Date.now() });
-                localStorage.setItem('msgLog', JSON.stringify(log.slice(-200)));
-            }
-            saveDB();
-            document.getElementById('admin-push-status').innerText = msg ? "Mensaje enviado." : "Mensaje borrado.";
-            document.getElementById('admin-push-status').style.color = msg ? "#38a169" : "#e53e3e";
+            try {
+                await apiSendMessage(msg, color);
+                st.innerText = msg ? "Mensaje enviado." : "Mensaje borrado."; st.style.color = msg ? "#38a169" : "#e53e3e";
+            } catch (e) { st.innerText = "Error de conexión: no se envió."; st.style.color = "#e53e3e"; }
         }
 
-        function clearPushMessage() {
-            db.pushMessage = { text: "", color: "red" };
+        async function clearPushMessage() {
             document.getElementById('admin-push-msg').value = "";
-            saveDB();
-            document.getElementById('admin-push-status').innerText = "Mensaje borrado.";
-            document.getElementById('admin-push-status').style.color = "#e53e3e";
+            db.pushMessage = { text: "", color: "red" };
+            const st = document.getElementById('admin-push-status');
+            try { await apiSendMessage("", "red"); st.innerText = "Mensaje borrado."; }
+            catch (e) { st.innerText = "Error de conexión: no se borró."; }
+            st.style.color = "#e53e3e";
         }
 
         function addOperator() {
@@ -1012,51 +912,27 @@
             if(activeInput) { activeInput.value = activeInput.value.slice(0, -1); activeInput.dispatchEvent(new Event('input')); }
         }
 
-        function servicePrefix(name) {
-            const used = [];
-            for (const sv of db.services) {
-                const letters = sv.name.normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
-                const p = [...letters].find(c => !used.includes(c)) || String.fromCharCode(65 + used.length);
-                used.push(p);
-                if (sv.name === name) return p;
-            }
-            return 'A';
-        }
-        function nextTurno(service) {
-            const p = servicePrefix(service), today = new Date().toDateString();
-            let c = JSON.parse(localStorage.getItem('turnCounters') || '{}');
-            if (c.date !== today) c = { date: today };
-            c[p] = (c[p] || 0) + 1;
-            localStorage.setItem('turnCounters', JSON.stringify(c));
-            return p + String(c[p]).padStart(3, '0');
-        }
-
-        function kioscoAction() {
+        async function kioscoAction() {
             const cedulaEl = document.getElementById('kiosco-cedula'), nombreEl = document.getElementById('kiosco-nombre');
             const cedula = cedulaEl.value.trim(), nombre = nombreEl.value.trim();
             if (!cedula) return alert("Ingrese cédula");
             if (!nombre) return alert("Ingrese nombre");
             if (!selectedService) return alert("Seleccione un servicio");
-
             if (kioscoBusy) return;
-            
-            const ced = cedula.replace(/\s+/g, '');
-            const dup = db.queue.find(q => String(q.cedula).replace(/\s+/g, '') === ced);
-            if (dup) { showKioscoMsg(`Ya tiene el turno ${dup.turno} en ${dup.servicio}. Por favor espere a ser llamado.`); return; }
             kioscoBusy = true;
-            
-            if (!db.clients.find(c => c.cedula === cedula)) db.clients.push({ cedula, nombre });
 
-            const turnoNum = nextTurno(selectedService);
-            db.queue.push({ cedula, nombre, servicio: selectedService, turno: turnoNum, timestamp: Date.now() });
-            saveDB();
+            let r;
+            try { r = await apiRegister(cedula, nombre, selectedService); }
+            catch (e) { kioscoBusy = false; showKioscoMsg('No hay conexión con el servidor. Intente de nuevo.'); return; }
+            if (r.code === 'DUPLICATE') { kioscoBusy = false; showKioscoMsg(`Ya tiene el turno ${r.turno} en ${r.servicio}. Por favor espere a ser llamado.`); return; }
+            if (!r.ok) { kioscoBusy = false; showKioscoMsg(r.message || 'No se pudo generar el turno.'); return; }
 
             const form = document.querySelector('#kiosco-screen .kiosco-top');
             const kb = document.getElementById('virtual-keyboard');
             const ticket = document.getElementById('ticket-display');
             form.style.display = 'none';
             kb.style.display = 'none';
-            document.getElementById('ticket-number').innerText = turnoNum;
+            document.getElementById('ticket-number').innerText = r.turno;
             ticket.style.display = 'block';
 
             setTimeout(() => {
@@ -1081,21 +957,19 @@
             select.innerHTML = db.services.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
 
             if(opInterval) clearInterval(opInterval);
-            opInterval = setInterval(() => {
-                const lg = localStorage.getItem('msgLog') || '';
-                if (lg !== lastMsgLog) { lastMsgLog = lg; renderMsgLog(); }
-                const newMsg = db.pushMessage;
-                if(JSON.stringify(newMsg) !== JSON.stringify(db.pushMessage)) {
-                    db.pushMessage = newMsg;
-                    renderPushMessage();
-                }
-            }, 2000);
+            opInterval = setInterval(async () => {
+                if (!currentOperator) return;
+                const snap = () => JSON.stringify([db.pushMessage, db.msgLog, db.opHistory]);
+                const before = snap();
+                await refreshLive();
+                if (snap() !== before) { renderPushMessage(); renderMsgLog(); renderOperatorHistory(); }
+            }, 5000);
         }
 
         let opMsgShown = 3, lastMsgLog = null;
         function renderMsgLog() {
             const el = document.getElementById('op-msg-log'), today = new Date().toDateString();
-            const all = JSON.parse(localStorage.getItem('msgLog') || '[]').filter(m => new Date(m.ts).toDateString() === today).reverse();
+            const all = (db.msgLog || []).filter(m => new Date(m.ts).toDateString() === today).reverse();
             if (!all.length) { el.style.display = 'none'; return; }
             el.style.display = 'block';
             const dot = { red: '🔴', yellow: '🟡', green: '🟢' };
@@ -1181,29 +1055,28 @@
         document.addEventListener('input', (e) => {
             if(e.target.id === 'op-notes-area' && selectedHistoryId !== null) {
                 const item = db.opHistory.find(h => h.id === selectedHistoryId);
-                if(item) { item.notes = e.target.value; saveDB(); }
+                if(item) { item.notes = e.target.value; apiNotes(item.id, item.notes); }
             }
         });
 
-        function callNext() {
+        let callBusy = false;
+        async function callNext() {
+            if (callBusy) return;
+            callBusy = true;
             const servicio = document.getElementById('op-service-select').value;
-            const nextIndex = db.queue.findIndex(u => u.servicio === servicio);
-            
-            if(nextIndex === -1) return alert("No hay turnos pendientes para: " + servicio);
-
-            const user = db.queue.splice(nextIndex, 1)[0];
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            db.activeCall = { turno: user.turno, nombre: user.nombre, box: currentOperator.box, timestamp: Date.now() };
-
-            const historyId = Date.now();
-            db.opHistory.push({ id: historyId, pin: currentOperator.pin, turno: user.turno, name: user.nombre, time: timeString, notes: "" });
-            
-            saveDB();
-            selectedHistoryId = historyId;
-            renderOperatorHistory();
-            selectHistory(historyId);
+            try {
+                const r = await apiCallNext(servicio, currentOperator);
+                if (r.empty) alert("No hay turnos pendientes para: " + servicio);
+                else if (!r.ok) alert(r.message || "No se pudo llamar el turno");
+                else {
+                    db.activeCall = r.call;
+                    db.opHistory.push(r.history);
+                    selectedHistoryId = r.history.id;
+                    renderOperatorHistory();
+                    selectHistory(r.history.id);
+                }
+            } catch (e) { alert("Sin conexión con el servidor. Intente de nuevo."); }
+            callBusy = false;
         }
 
         let draggedPanel = null;
@@ -1231,6 +1104,7 @@
         function startScreen() {
             audioEnabled = true;
             document.getElementById('audio-overlay').style.display = 'none';
+            window.lastCall = db.activeCall ? db.activeCall.timestamp : 0;
             applyVisualConfig();
             initScreenListeners();
             startPlaylist();
@@ -1238,12 +1112,12 @@
             fetchWeather();
             setInterval(() => { applyVisualConfig(); renderTVRSS(); }, 15 * 60 * 1000);
             setInterval(async () => {
-                await loadData();
+                if (await refreshLive()) { applyVisualConfig(); renderTVRSS(); }
                 if(db.activeCall && db.activeCall.timestamp > (window.lastCall || 0)) {
                     window.lastCall = db.activeCall.timestamp;
                     processNewCall(db.activeCall);
                 }
-            }, 5000);
+            }, 4000);
         }
 
         function applyVisualConfig() {
