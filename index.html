@@ -1,15 +1,3 @@
-Entendido. He tomado **exactamente tu HTML** (el que llamas "el bueno") y le he inyectado la lógica para conectarse con Google Sheets, respetando todo tu diseño, tus funciones de vista previa, el logo, el historial y la lógica de los RSS.
-
-He blindado la comunicación con Google Sheets usando `GET` para leer y `FormData` (POST) para guardar. Esto evita los errores de CORS que tuvimos antes.
-
-### ⚠️ ÚNICO PASO REQUERIDO:
-Busca la línea `const API_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';` (cerca de la línea 480) y **reemplaza ese texto con tu URL de Google Apps Script** (la que termina en `/exec`).
-
-Recuerda que en tu Google Apps Script debes tener el código `Code.gs` que te di en el mensaje anterior y **debes haber creado una "Nueva Versión"** en Implementar.
-
-Aquí tienes el código completo listo para copiar y pegar:
-
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
