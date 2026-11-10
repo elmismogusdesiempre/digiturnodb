@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Turnos Pro - V5 (Conexión Estable)</title>
+    <title>Sistema de Turnos Pro - V4</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -35,20 +35,25 @@
         .launcher-btn { padding: 30px 50px; font-size: 1.2rem; border: 2px solid var(--primary); border-radius: 12px; cursor: pointer; background: white; color: var(--primary); transition: all 0.3s ease; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .launcher-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,86,179,0.2); }
 
-        /* 1. ADMIN (CON TABS Y PREVIEW) */
+        /* 1. ADMIN (REDISEÑADO CON TABS Y PREVIEW) */
         #admin-screen { padding: 0; flex-direction: row; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar de Tabs */
         .admin-sidebar { width: 200px; background: #fff; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.02); z-index: 10;}
         .tab-btn { padding: 15px 20px; background: none; border: none; text-align: left; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; border-left: 4px solid transparent;}
         .tab-btn:hover { background: #f7fafc; color: var(--primary); }
         .tab-btn.active { background: #ebf8ff; color: var(--primary); border-left-color: var(--primary); }
         
+        /* Contenido Central */
         .admin-content-area { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column;}
         .tab-content { display: none; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* Panel Derecho (Preview) */
         .admin-preview-area { width: 450px; background: #fff; border-left: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; box-shadow: -2px 0 10px rgba(0,0,0,0.02); z-index: 10;}
 
+        /* Estilos Admin Forms */
         h2 { margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--bg-light); padding-bottom: 10px; font-size: 1.2rem; font-weight: 700; }
         .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
         .form-group label { font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-dark); }
@@ -64,12 +69,14 @@
         .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
         .toggle-switch:checked::after { left: 22px; }
 
+        /* Modal Help */
         .help-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .help-content { background: white; width: 80%; max-width: 800px; max-height: 80vh; overflow-y: auto; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .help-content h3 { color: var(--primary); margin-bottom: 15px; }
         .help-content p, .help-content li { margin-bottom: 10px; line-height: 1.6; }
         .help-content ul { padding-left: 20px; margin-bottom: 20px; }
 
+        /* Preview TV */
         .tv-preview-container { width: 100%; background: #000; aspect-ratio: 16/9; border-radius: 8px; border: 2px solid #cbd5e0; position: relative; overflow: hidden; display: flex; flex-direction: column; }
         .preview-grid { display: grid; grid-template-columns: 2.2fr 1fr; grid-template-rows: 1fr auto; height: 100%; width: 100%; gap: 2px; }
         .preview-video { background: #222; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.8rem; overflow: hidden;}
@@ -77,21 +84,27 @@
         .preview-right { background: var(--tv-blue); display: flex; flex-direction: column; }
         .preview-ticker { display: flex; flex-direction: column; width: 100%; overflow: hidden;}
 
-        /* 2. KIOSCO */
+        /* 2. KIOSCO (REDISEÑADO) */
         #kiosco-screen { flex-direction: column; background: var(--bg-light); align-items: center; overflow: hidden;}
+        
         .kiosco-top { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto;}
         .kiosco-box { text-align: center; max-width: 800px; width: 100%; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 20px;}
         .kiosco-box h1 { color: var(--primary); margin-bottom: 15px; font-size: 2rem;}
+        
         .kiosco-input-group { display: flex; gap: 15px; margin-bottom: 20px;}
         .kiosco-input { font-size: 1.8rem; padding: 15px; width: 100%; text-align: center; border: 2px solid var(--border-color); border-radius: 10px; background: #f7fafc; outline: none;}
         .kiosco-input:focus { border-color: var(--primary); background: white;}
+        
+        /* Botones de Servicio */
         .services-grid { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;}
         .service-btn { flex: 1; min-width: 150px; padding: 20px; font-size: 1.5rem; font-weight: bold; border: 3px solid var(--border-color); border-radius: 15px; background: white; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px;}
         .service-btn.selected { border-color: var(--primary); background: #ebf8ff; color: var(--primary); box-shadow: 0 4px 10px rgba(0,86,179,0.2);}
         .service-emoji { font-size: 3rem; }
+        
         .kiosco-btn { font-size: 1.8rem; padding: 20px; width: 100%; max-width: 600px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: background 0.3s; margin-top: 10px;}
         .kiosco-btn:hover { background: #004494; }
         
+        /* Teclado Virtual Gigante */
         #virtual-keyboard { width: 100%; background: #e2e8f0; padding: 10px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); border-top: 1px solid #cbd5e0; display: flex; flex-direction: column; gap: 5px; z-index: 9999;}
         .keyboard-row { display: flex; justify-content: center; gap: 5px; width: 100%;}
         .key { background: white; border: 1px solid #cbd5e0; border-radius: 8px; flex: 1; padding: 15px 0; font-size: 1.8rem; font-weight: bold; color: #2d3748; cursor: pointer; text-align: center; box-shadow: 0 3px 0 #cbd5e0; user-select: none;}
@@ -154,14 +167,18 @@
         .tv-last-call-content .last-name { font-size: 2rem; font-weight: normal; margin: 5px 0; color: #e2e8f0;}
         .tv-last-call-content p { font-size: 1.5rem; font-weight: bold; margin-top: 5px;}
         .tv-recent-calls { background: var(--tv-blue); flex: 1.2; display: flex; flex-direction: column; }
+        /* TURNOS RECIENTES ENORMES */
         .tv-recent-list { padding: 15px; list-style: none; flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
         .tv-recent-list li { font-size: 2.8rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 5px;}
         .tv-recent-list li .r-name { font-size: 1.6rem; font-weight: normal; opacity: 0.9; flex: 1; padding-left: 15px; text-align: left;}
         .tv-recent-list li .r-box { font-size: 2rem; }
+
+        /* RSS TICKERS FIXED */
         .tv-rss-area { grid-column: 1 / -1; grid-row: 2; display: flex; flex-direction: column; background: #111; max-height: 50vh; overflow: hidden;}
         .rss-line { display: flex; align-items: center; overflow: hidden; position: relative; border-bottom: 1px solid #333; width: 100%; white-space: nowrap;}
         .rss-text { display: inline-block; font-weight: 800; text-transform: uppercase; padding-left: 100vw; animation: marquee-left linear infinite;}
 
+        /* POPUP MODAL */
         #popup-turno { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); z-index: 999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .popup-card { background: var(--tv-blue); width: 55%; max-width: 900px; padding: 40px; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; border: 4px solid var(--tv-green); display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .popup-card h3 { font-size: 1.8rem; color: #a5d6a7; margin-bottom: 10px; letter-spacing: 3px;}
@@ -170,19 +187,52 @@
         .popup-card p { font-size: 4rem; color: #fff; background: var(--tv-green); padding: 10px 30px; border-radius: 15px; font-weight: bold; margin: 0; }
 
         .hidden { display: none !important; }
-        
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.9); z-index: 999999; display: flex; align-items: center; justify-content: center; flex-direction: column; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
-        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ===== V5 FIXES ===== */
+        .admin-content-area { overflow: hidden; padding: 20px 24px; min-height: 0; }
+        .tab-content.active { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+        .list-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+        .admin-preview-area { width: clamp(340px, 32vw, 520px); }
+        .tv-preview-container { position: relative; }
+        .pv-stage { position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: #000; color: #fff; }
+        .pv-stage .tv-rss-area { max-height: 540px; }
+        .rss-card { background: #f7fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+        .rss-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+        .rss-row label { font-size: 0.75rem; font-weight: 600; display: flex; flex-direction: column; gap: 3px; }
+        .rss-row label.grow { flex: 1; }
+        .rss-row input[type=color] { width: 44px; height: 28px; padding: 0; border: 1px solid var(--border-color); }
+        .rss-row input[type=text], .rss-row select { padding: 7px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; }
+        .rss-status { font-size: 0.78rem; min-height: 1em; }
+        .usage { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+        .usage-bar { flex: 1; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
+        #rss-usage-fill { height: 100%; background: #38a169; transition: width .2s; }
+        /* Playlist: llenar la zona sin franjas negras */
+        #media-container { position: relative; container-type: size; }
+        .media-content { object-fit: cover !important; width: 100%; height: 100%; display: block; }
+        .media-content.yt { position: absolute; top: 50%; left: 50%; width: max(100cqw, 177.78cqh); height: max(100cqh, 56.25cqw); transform: translate(-50%, -50%); border: 0; }
+        .rss-text { padding-left: 0 !important; white-space: nowrap; will-change: transform; }
+        .tv-grid.no-video .tv-right-col { grid-column: 1; }
+        /* Operador: 3 tarjetas a todo el ancho */
+        #operador-screen { justify-content: stretch; }
+        #op-panel { gap: 20px; }
+        .op-main-panel, .op-side-panel, .op-notes-panel { flex: 1 1 0; min-width: 0; max-width: none; }
+        .op-panel.drag-over { outline: 3px dashed var(--primary); outline-offset: -3px; }
+        #kiosco-screen { position: relative; }
+        .form-group input.toggle-switch { width: 44px; flex: none; padding: 0; }
+        .tv-video-area { position: relative; }
+        .tv-logo { position: absolute; width: 16%; max-height: 28%; object-fit: contain; display: none; pointer-events: none; z-index: 5; margin: 2%; }
+        .corner-grid { position: relative; width: 240px; height: 135px; background: #222; border-radius: 8px; margin-top: 4px; }
+        .corner-grid button { position: absolute; width: 56px; height: 34px; border: 2px solid #718096; border-radius: 6px; background: #4a5568; color: #fff; cursor: pointer; font-size: .7rem; }
+        .corner-grid button.on { background: var(--primary); border-color: #90cdf4; }
+        .corner-grid [data-pos=tl] { top: 6px; left: 6px; } .corner-grid [data-pos=tr] { top: 6px; right: 6px; }
+        .corner-grid [data-pos=bl] { bottom: 6px; left: 6px; } .corner-grid [data-pos=br] { bottom: 6px; right: 6px; }
+        #op-msg-log { display: none; margin-bottom: 14px; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .msg-list { max-height: min(150px, 18vh); overflow-y: auto; }
+        .msg-item { display: flex; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--border-color); font-size: .9rem; }
+        .msg-more { width: 100%; padding: 8px; background: #f7fafc; border: 0; border-top: 1px solid var(--border-color); cursor: pointer; font-weight: 600; color: var(--primary); }
     </style>
 </head>
 <body>
-    
-    <!-- OVERLAY DE CARGA -->
-    <div id="loading-overlay">
-        <div class="spinner"></div>
-        Conectando con Google Sheets...
-    </div>
 
     <div id="secret-trigger" onmousedown="startHold()" onmouseup="cancelHold()" onmouseleave="cancelHold()" ontouchstart="startHold()" ontouchend="cancelHold()"></div>
 
@@ -198,19 +248,23 @@
         </div>
     </div>
 
-    <!-- 1. PANTALLA ADMIN -->
+    <!-- 1. PANTALLA ADMIN (REDISEÑADA CON TABS) -->
     <div id="admin-screen" class="screen">
+        <!-- Sidebar -->
         <div class="admin-sidebar">
             <div style="padding: 0 20px 10px; font-weight: bold; color: var(--primary); font-size: 1.2rem; border-bottom: 1px solid #eee; margin-bottom: 10px;">Menú</div>
             <button class="tab-btn active" onclick="openTab('tab-ops')">👥 Operadores</button>
             <button class="tab-btn" onclick="openTab('tab-msgs')">📢 Mensajes</button>
             <button class="tab-btn" onclick="openTab('tab-playlist')">🖼️ Playlist</button>
+            <button class="tab-btn" onclick="openTab('tab-logo')">🏷️ Logo</button>
             <button class="tab-btn" onclick="openTab('tab-services')">🏥 Servicios</button>
             <button class="tab-btn" onclick="openTab('tab-rss')">📰 Tickers RSS</button>
             <button class="tab-btn" onclick="toggleHelp()" style="margin-top: auto; color: #e53e3e;">❓ Ayuda</button>
         </div>
         
+        <!-- Contenido Central -->
         <div class="admin-content-area">
+            <!-- Tab Operadores -->
             <div id="tab-ops" class="tab-content active">
                 <h2>Operadores</h2>
                 <div style="display: flex; gap: 10px;">
@@ -219,9 +273,10 @@
                     <div class="form-group" style="flex:1;"><label>Box</label><input type="text" id="admin-op-box" placeholder="Box 1"></div>
                 </div>
                 <button class="btn" onclick="addOperator()">Agregar Operador</button>
-                <div id="admin-op-list" style="margin-top: 15px;"></div>
+                <div id="admin-op-list" class="list-scroll" style="margin-top: 15px;"></div>
             </div>
 
+            <!-- Tab Mensajes -->
             <div id="tab-msgs" class="tab-content">
                 <h2>Mensajes a Operadores</h2>
                 <div class="form-group">
@@ -241,6 +296,7 @@
                 <div id="admin-push-status" style="margin-top: 10px; font-size: 0.9rem; font-weight: bold;"></div>
             </div>
 
+            <!-- Tab Playlist -->
             <div id="tab-playlist" class="tab-content">
                 <h2>Playlist Multimedia</h2>
                 <div class="form-group">
@@ -251,9 +307,25 @@
                 <div class="form-group"><label>URL de Imagen/Video</label><input type="text" id="admin-media-url" placeholder="https://..."></div>
                 <div class="form-group"><label>Duración (segundos)</label><input type="number" id="admin-media-time" value="10"></div>
                 <button class="btn" onclick="addMedia()">Añadir a Playlist</button>
-                <div id="admin-media-list" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
+                <div id="admin-media-list" class="list-scroll" style="margin-top: 15px;"></div>
             </div>
 
+            <!-- Tab Logo -->
+            <div id="tab-logo" class="tab-content">
+                <h2>Logo en la zona multimedia</h2>
+                <div class="form-group"><label>Subir logo (PNG, WebP o SVG con fondo transparente, máx 400KB)</label><input type="file" id="admin-logo-file" accept="image/png,image/webp,image/svg+xml" onchange="handleLogoUpload(event)"></div>
+                <div class="form-group"><label>Esquina donde se ubica</label>
+                    <div class="corner-grid">
+                        <button data-pos="tl" onclick="setLogo('pos','tl')">Sup. izq</button><button data-pos="tr" onclick="setLogo('pos','tr')">Sup. der</button>
+                        <button data-pos="bl" onclick="setLogo('pos','bl')">Inf. izq</button><button data-pos="br" onclick="setLogo('pos','br')">Inf. der</button>
+                    </div>
+                </div>
+                <div class="form-group"><label>Transparencia: <span id="logo-tval">0%</span></label><input type="range" min="0" max="90" id="logo-transp" value="0" oninput="setLogo('transp', +this.value)"></div>
+                <button class="btn btn-danger" style="width:auto" onclick="removeLogo()">Quitar logo</button>
+                <p id="logo-status" style="font-size:.85rem;color:var(--text-muted);margin-top:8px"></p>
+            </div>
+
+            <!-- Tab Servicios -->
             <div id="tab-services" class="tab-content">
                 <h2>Tipos de Servicio</h2>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Configura los servicios que aparecerán en el Kiosco.</p>
@@ -262,28 +334,21 @@
                     <div class="form-group" style="flex:1;"><label>Emoji</label><input type="text" id="admin-srv-emoji" placeholder="Ej. 🩺" style="font-size: 1.5rem;"></div>
                 </div>
                 <button class="btn" onclick="addService()">Agregar Servicio</button>
-                <div id="admin-srv-list" style="margin-top: 15px;"></div>
+                <div id="admin-srv-list" class="list-scroll" style="margin-top: 15px;"></div>
             </div>
 
+            <!-- Tab RSS -->
             <div id="tab-rss" class="tab-content">
                 <h2>Configuración de Tickers RSS</h2>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">La suma de alturas no debe superar el 50% de la pantalla.</p>
+                <div class="usage"><span>Espacio usado en pantalla</span><div class="usage-bar"><div id="rss-usage-fill"></div></div></div>
                 <div id="rss-inputs"></div>
             </div>
         </div>
 
+        <!-- Panel de Vista Previa -->
         <div class="admin-preview-area">
             <h2 style="margin-bottom: 10px;">Vista Previa TV</h2>
-            <div class="tv-preview-container">
-                <div class="preview-grid" id="preview-grid">
-                    <div class="preview-video" id="preview-video">Sin Video</div>
-                    <div class="preview-right">
-                        <div style="background: var(--tv-bg); padding: 5px; text-align: right; font-size: 0.8rem;">10:45 AM</div>
-                        <div style="background: var(--tv-blue); flex: 1; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">A034</div>
-                    </div>
-                    <div class="preview-ticker" id="preview-ticker"></div>
-                </div>
-            </div>
+            <div class="tv-preview-container" id="pv-wrap"><div class="pv-stage" id="pv-stage"></div></div>
             <div class="form-group" style="margin-top: 15px; flex-direction: row; align-items: center; gap: 10px;">
                 <label>Mostrar Video en TV</label>
                 <input type="checkbox" class="toggle-switch" id="toggle-video" onchange="saveConfig()">
@@ -294,20 +359,33 @@
     <!-- MODAL AYUDA -->
     <div id="help-modal" class="help-modal">
         <div class="help-content">
-            <h3>Manual de Usuario</h3>
-            <p><strong>1. Admin:</strong> Crea operadores, envía mensajes push con semáforo, configura la playlist (sube imágenes de tu PC o pon URLs), crea los servicios para el Kiosco y configura los tickers RSS (color, velocidad, altura).</p>
-            <p><strong>2. Kiosco:</strong> El cliente digita su cédula (si ya existe, carga su nombre), escribe su nombre con el teclado gigante inferior y elige el servicio con los botones grandes. Luego recibe su turno.</p>
-            <p><strong>3. Operador:</strong> Entra con su PIN. Arrastra los paneles para organizarse. Haz clic en un turno de la derecha para escribirle notas en el panel izquierdo.</p>
-            <p><strong>4. Pantalla TV:</strong> Muestra el clima, reloj, el último turno (con nombre y consultorio) y la lista de recientes (en tamaño grande). Abajo rotan los tickers RSS.</p>
+            <h3>Manual de Usuario - Sistema de Turnos</h3>
+            <p><strong>1. Pantalla de Administrador:</strong></p>
+            <ul>
+                <li><strong>Operadores:</strong> Crea los usuarios (Nombre, PIN, Box).</li>
+                <li><strong>Mensajes:</strong> Envía alertas a los operadores con semáforo (Rojo, Amarillo, Verde).</li>
+                <li><strong>Playlist:</strong> Sube imágenes de tu PC o pega URLs. Se reproducirán en la TV.</li>
+                <li><strong>Servicios:</strong> Crea los botones (con emoji) que los clientes verán en el Kiosco.</li>
+                <li><strong>Tickers RSS:</strong> Noticias o textos. Configura altura, color, velocidad.</li>
+            </ul>
+            <p><strong>2. Pantalla de Kiosco:</strong></p>
+            <ul>
+                <li>El cliente digita su cédula, nombre y elige servicio. El teclado está siempre visible abajo.</li>
+            </ul>
+            <p><strong>3. Pantalla de Operador:</strong></p>
+            <ul>
+                <li>Entra con su PIN. Puede <strong>arrastrar los paneles</strong> usando el ícono de puntos.</li>
+                <li>Haga clic en el historial para escribirle <strong>Notas</strong>.</li>
+            </ul>
             <p><em>Tip: Mantén presionada la esquina superior izquierda por 3 segundos para volver al menú.</em></p>
             <button class="btn" onclick="toggleHelp()">Cerrar Manual</button>
         </div>
     </div>
 
-    <!-- 2. KIOSCO -->
+    <!-- 2. KIOSCO (REDISEÑADO) -->
     <div id="kiosco-screen" class="screen">
         <div class="kiosco-top">
-            <div class="kiosco-box" id="kiosco-form">
+            <div class="kiosco-box">
                 <h1>Bienvenido</h1>
                 <p style="margin-bottom: 20px; font-size: 1.2rem; color: var(--text-muted);">Ingrese sus datos y seleccione el servicio</p>
                 
@@ -316,12 +394,16 @@
                     <input type="text" id="kiosco-nombre" class="kiosco-input" placeholder="Nombre Completo" readonly>
                 </div>
                 
-                <div class="services-grid" id="kiosco-services-container"></div>
+                <div class="services-grid" id="kiosco-services-container">
+                    <!-- Se llena dinámicamente -->
+                </div>
                 
                 <button class="kiosco-btn" id="btn-kiosco-action" onclick="kioscoAction()">Registrar Turno</button>
+                <p id="kiosco-msg" style="color:#e53e3e;font-weight:bold;font-size:1.3rem;margin-top:12px"></p>
             </div>
         </div>
 
+        <!-- TECLADO VIRTUAL FIJO -->
         <div id="virtual-keyboard">
             <div class="keyboard-row">
                 <div class="key" onclick="typeChar('1')">1</div><div class="key" onclick="typeChar('2')">2</div><div class="key" onclick="typeChar('3')">3</div><div class="key" onclick="typeChar('4')">4</div><div class="key" onclick="typeChar('5')">5</div><div class="key" onclick="typeChar('6')">6</div><div class="key" onclick="typeChar('7')">7</div><div class="key" onclick="typeChar('8')">8</div><div class="key" onclick="typeChar('9')">9</div><div class="key" onclick="typeChar('0')">0</div>
@@ -363,11 +445,14 @@
                 </div>
                 <div class="op-main-content">
                     <div id="op-push-zone"></div>
+                    <div id="op-msg-log"></div>
                     <div class="op-header">
                         <h1 id="op-welcome">Bienvenido</h1>
                         <p>Atendiendo en: <strong id="op-box-name" style="color: var(--text-dark);"></strong></p>
                     </div>
-                    <select id="op-service-select" class="kiosco-input" style="font-size: 1.2rem; padding: 15px; margin-bottom: 20px;"></select>
+                    <select id="op-service-select" class="kiosco-input" style="font-size: 1.2rem; padding: 15px; margin-bottom: 20px;">
+                        <!-- Se llena dinámicamente -->
+                    </select>
                     <button class="btn-next" onclick="callNext()">SIGUIENTE TURNO</button>
                     <button class="btn btn-danger" style="width: 100%; padding: 15px; font-size: 1rem; margin-top: auto;" onclick="logoutOperator()">Cerrar Sesión</button>
                 </div>
@@ -406,6 +491,7 @@
         <div class="tv-grid" id="tv-grid">
             <div class="tv-video-area" id="zona-video">
                 <div id="media-container" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000;"></div>
+                <img id="tv-logo" class="tv-logo" alt="">
             </div>
 
             <div class="tv-right-col" id="zona-derecha">
@@ -452,130 +538,62 @@
     </div>
 
     <script>
-        // ============================================================
-        // API.JS INTEGRADO CON FIX DE CORS
-        // ============================================================
-        // ⚠️ REEMPLAZA ESTA URL CON LA DE TU GOOGLE APPS SCRIPT
-        const API_URL = 'https://script.google.com/macros/s/AKfycby2l-J5soheP4RXRrSwuP0ymBOR_0ZQa61aUndXcshu4q8xrT-kGU6aYCAp9UXOiHeA/exec';
-
-        let db = {};
-
-        async function loadData() {
-            try {
-                const response = await fetch(`${API_URL}?action=getAll`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                
-                db = {
-                    operators: data.operators || [],
-                    queue: data.queue || [],
-                    playlist: data.playlist || [],
-                    services: data.services || [],
-                    rss: data.rss || [],
-                    clients: data.clients || [],
-                    opHistory: data.opHistory || [],
-                    pushMessage: data.pushMessage || { text: '', color: 'red' },
-                    config: {
-                        primaryColor: data.config?.primaryColor || '#0056b3',
-                        showVideo: data.config?.showVideo !== undefined ? data.config.showVideo : true
-                    }
-                };
-
-                // Defaults por si la hoja está vacía
-                if (db.operators.length === 0) db.operators = [{ name: 'Admin', pin: '1234', box: 'Box 1' }];
-                if (db.services.length === 0) {
-                    db.services = [
-                        { name: 'Medicina General', emoji: '🩺' },
-                        { name: 'Odontología', emoji: '🦷' },
-                        { name: 'Asesoría Comercial', emoji: '💼' }
-                    ];
-                }
-                if (db.rss.length === 0) {
-                    db.rss = [
-                        { active: true, type: 'text', content: 'Bienvenidos a Clínica Central', bgColor: '#0d47a1', textColor: '#ffffff', height: 10, speed: 20, direction: 'left' },
-                        { active: true, type: 'rss', content: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.eltiempo.com/rss/colombia.xml', bgColor: '#b71c1c', textColor: '#ffffff', height: 10, speed: 25, direction: 'left' },
-                        { active: false, type: 'text', content: 'Mantenga su distancia', bgColor: '#2e7d32', textColor: '#ffffff', height: 10, speed: 15, direction: 'right' }
-                    ];
-                }
-                return db;
-            } catch (error) {
-                console.warn('⚠️ Error al cargar datos de Sheets. Usando respaldo local:', error);
-                // Fallback silencioso
-                db = {
-                    operators: JSON.parse(localStorage.getItem('operators') || '[{"name":"Admin","pin":"1234","box":"Box 1"}]'),
-                    queue: JSON.parse(localStorage.getItem('queue') || '[]'),
-                    playlist: JSON.parse(localStorage.getItem('playlist') || '[]'),
-                    services: JSON.parse(localStorage.getItem('services') || '[]'),
-                    rss: JSON.parse(localStorage.getItem('rss') || '[]'),
-                    clients: JSON.parse(localStorage.getItem('clients') || '[]'),
-                    opHistory: JSON.parse(localStorage.getItem('opHistory') || '[]'),
-                    pushMessage: JSON.parse(localStorage.getItem('pushMessage') || '{"text":"","color":"red"}'),
-                    config: JSON.parse(localStorage.getItem('config') || '{"primaryColor":"#0056b3","showVideo":true}')
-                };
-                if (db.operators.length === 0) db.operators = [{ name: 'Admin', pin: '1234', box: 'Box 1' }];
-                return db;
-            }
-        }
-
-        async function saveDB() {
-            // 1. Guardar en local primero
-            localStorage.setItem('operators', JSON.stringify(db.operators));
-            localStorage.setItem('queue', JSON.stringify(db.queue));
-            localStorage.setItem('playlist', JSON.stringify(db.playlist));
-            localStorage.setItem('services', JSON.stringify(db.services));
-            localStorage.setItem('rss', JSON.stringify(db.rss));
-            localStorage.setItem('clients', JSON.stringify(db.clients));
-            localStorage.setItem('opHistory', JSON.stringify(db.opHistory));
-            localStorage.setItem('pushMessage', JSON.stringify(db.pushMessage));
-            localStorage.setItem('config', JSON.stringify(db.config));
-
-            try {
-                const payload = {
-                    action: 'saveAll',
-                    payload: {
-                        operators: db.operators,
-                        queue: db.queue,
-                        playlist: db.playlist,
-                        services: db.services,
-                        rss: db.rss,
-                        clients: db.clients,
-                        opHistory: db.opHistory,
-                        config: {
-                            primaryColor: db.config?.primaryColor || '#0056b3',
-                            showVideo: db.config?.showVideo !== undefined ? db.config.showVideo : true,
-                            pushMessage: JSON.stringify(db.pushMessage || { text: '', color: 'red' })
-                        }
-                    }
-                };
-                
-                // Usamos no-cors y text/plain para evitar bloqueos de CORS
-                fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                }).catch(e => console.log('Fetch no-cors ignorado:', e));
-                
-                console.log('✅ Datos enviados a Sheets');
-            } catch (error) {
-                console.error('❌ Error guardando en Sheets:', error);
-            }
-        }
-
-        // ============================================================
-        // LÓGICA PRINCIPAL DE LA APP
-        // ============================================================
-        
         let holdTimer;
         function startHold() { holdTimer = setTimeout(() => { window.location.reload(); }, 3000); }
         function cancelHold() { clearTimeout(holdTimer); }
 
-        // Inicialización
-        window.onload = async () => {
-            await loadData();
-            document.getElementById('loading-overlay').style.display = 'none';
-            renderAdmin(); 
+        function getSafeItem(key, defaultVal) {
+            try {
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : defaultVal;
+            } catch (e) {
+                return defaultVal;
+            }
+        }
+
+        let defaultRSS = [
+            { active: true, type: 'text', content: 'Bienvenidos a Clínica Central', bgColor: '#0d47a1', textColor: '#ffffff', height: 10, speed: 20, direction: 'left' },
+            { active: true, type: 'rss', content: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.eltiempo.com/rss/colombia.xml', bgColor: '#b71c1c', textColor: '#ffffff', height: 10, speed: 25, direction: 'left' },
+            { active: false, type: 'text', content: 'Mantenga su distancia', bgColor: '#2e7d32', textColor: '#ffffff', height: 10, speed: 15, direction: 'right' }
+        ];
+
+        const UNIT = 2.5, MAXVH = 50, PX = 10.8;
+        function normRSS(a) {
+            a.forEach(f => {
+                if (f.size === undefined) f.size = Math.min(10, Math.max(1, Math.round((f.height || 10) / UNIT)));
+                if (f.pace === undefined) f.pace = Math.min(10, Math.max(1, Math.round(11 - (f.speed || 20) / 6)));
+                if (f.type === 'rss' && /rss2json/.test(f.content || '')) f.type = 'json';
+            });
+            return a;
+        }
+        function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        let defaultServices = [
+            { name: 'Medicina General', emoji: '🩺' },
+            { name: 'Odontología', emoji: '🦷' },
+            { name: 'Asesoría Comercial', emoji: '💼' }
+        ];
+
+        let db = {
+            operators: getSafeItem('operators', [{ name: 'Admin', pin: '1234', box: 'Box 1' }]),
+            queue: getSafeItem('queue', []),
+            activeCall: getSafeItem('activeCall', null),
+            playlist: getSafeItem('playlist', [{ url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80', time: 5 }]),
+            rss: normRSS(getSafeItem('rss', defaultRSS)),
+            services: getSafeItem('services', defaultServices),
+            clients: getSafeItem('clients', []), // Base de datos simple de clientes
+            config: getSafeItem('config', { primaryColor: '#0056b3', showVideo: true }),
+            pushMessage: getSafeItem('pushMessage', { text: "", color: "red" }),
+            opHistory: getSafeItem('opHistory', [])
         };
+
+        if (typeof db.pushMessage === 'string') db.pushMessage = { text: db.pushMessage, color: 'red' };
+
+        // saveDB() guarda solo configuración. Los datos "vivos" se guardan solo cuando se piden
+        // (así una pestaña desactualizada no pisa la fila de turnos ni el historial).
+        function saveDB(...keys) {
+            const cfg = ['operators','playlist','rss','services','config','pushMessage'];
+            (keys.length ? keys : cfg).forEach(k => localStorage.setItem(k, JSON.stringify(db[k])));
+        }
 
         function enterMode(mode) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -595,7 +613,7 @@
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            document.querySelector(`.tab-btn[onclick*="${tabId}"]`).classList.add('active');
         }
 
         function toggleHelp() {
@@ -604,8 +622,7 @@
         }
 
         function renderAdmin() {
-            if(!db.operators) return;
-
+            // Operadores
             const opList = document.getElementById('admin-op-list');
             opList.innerHTML = db.operators.map((op, index) => `
                 <div class="list-item">
@@ -614,6 +631,7 @@
                 </div>
             `).join('');
 
+            // Playlist
             const mediaList = document.getElementById('admin-media-list');
             mediaList.innerHTML = db.playlist.map((m, i) => `
                 <div class="list-item">
@@ -623,6 +641,7 @@
                 </div>
             `).join('');
 
+            // Servicios
             const srvList = document.getElementById('admin-srv-list');
             srvList.innerHTML = db.services.map((srv, i) => `
                 <div class="list-item">
@@ -631,101 +650,215 @@
                 </div>
             `).join('');
 
+            // Push Message
             document.getElementById('admin-push-msg').value = db.pushMessage.text;
             document.getElementById('admin-push-color').value = db.pushMessage.color;
+            
+            // Config
             document.getElementById('toggle-video').checked = db.config.showVideo;
+            renderLogoTab();
 
-            const rssContainer = document.getElementById('rss-inputs');
-            rssContainer.innerHTML = db.rss.map((feed, i) => `
-                <div style="background: #f7fafc; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            renderRSSInputs();
+            
+            updatePreview();
+        }
+
+        function renderRSSUsage() {
+            const tot = db.rss.reduce((a, f) => a + (f.active ? f.size * UNIT : 0), 0);
+            document.getElementById('rss-usage-fill').style.width = Math.min(100, tot / MAXVH * 100) + '%';
+        }
+        function renderRSSInputs() {
+            document.getElementById('rss-inputs').innerHTML = db.rss.map((f, i) => `
+                <div class="rss-card">
+                    <div class="rss-row">
                         <strong>Ticker ${i+1}</strong>
-                        <input type="checkbox" class="toggle-switch" ${feed.active ? 'checked' : ''} onchange="updateRSSConfig(${i}, 'active', this.checked)">
+                        <select onchange="updateRSSConfig(${i}, 'type', this.value, true)">
+                            <option value="text" ${f.type==='text'?'selected':''}>Texto fijo</option>
+                            <option value="rss" ${f.type==='rss'?'selected':''}>RSS / Atom (XML)</option>
+                            <option value="json" ${f.type==='json'?'selected':''}>JSON (rss2json u otro)</option>
+                        </select>
+                        <input type="text" style="flex:1" value="${esc(f.content)}" placeholder="${f.type==='text'?'Escribe el mensaje…':'https://… dirección del feed'}" oninput="updateRSSConfig(${i}, 'content', this.value)">
+                        ${f.type!=='text' ? `<button class="btn" style="width:auto;margin:0;padding:8px 12px" onclick="testFeed(${i})">Probar</button>` : ''}
+                        <input type="checkbox" class="toggle-switch" ${f.active?'checked':''} onchange="updateRSSConfig(${i}, 'active', this.checked, true)">
                     </div>
-                    <div class="form-group" style="flex-direction: row; gap: 10px;">
-                        <div style="flex: 1;">
-                            <label>Tipo</label>
-                            <select onchange="updateRSSConfig(${i}, 'type', this.value)">
-                                <option value="text" ${feed.type === 'text' ? 'selected' : ''}>Texto</option>
-                                <option value="rss" ${feed.type === 'rss' ? 'selected' : ''}>RSS URL</option>
-                            </select>
-                        </div>
-                        <div style="flex: 2;"><label>Contenido / URL</label><input type="text" value="${feed.content}" oninput="updateRSSConfig(${i}, 'content', this.value)"></div>
+                    <div class="rss-row">
+                        <label>Fondo<input type="color" value="${f.bgColor}" onchange="updateRSSConfig(${i}, 'bgColor', this.value)"></label>
+                        <label>Texto<input type="color" value="${f.textColor}" onchange="updateRSSConfig(${i}, 'textColor', this.value)"></label>
+                        <label class="grow">Tamaño<input type="range" min="1" max="10" value="${f.size}" id="sz-${i}" oninput="updateRSSConfig(${i}, 'size', +this.value)"></label>
+                        <label class="grow">Velocidad<input type="range" min="1" max="10" value="${f.pace}" oninput="updateRSSConfig(${i}, 'pace', +this.value)"></label>
+                        <label>Dirección<select onchange="updateRSSConfig(${i}, 'direction', this.value)"><option value="left" ${f.direction==='left'?'selected':''}>← Izq</option><option value="right" ${f.direction==='right'?'selected':''}>Der →</option></select></label>
                     </div>
-                    <div class="form-group" style="flex-direction: row; gap: 10px;">
-                        <div style="flex: 1;"><label>Fondo</label><input type="color" value="${feed.bgColor}" onchange="updateRSSConfig(${i}, 'bgColor', this.value)"></div>
-                        <div style="flex: 1;"><label>Texto</label><input type="color" value="${feed.textColor}" onchange="updateRSSConfig(${i}, 'textColor', this.value)"></div>
-                        <div style="flex: 1;"><label>Altura (vh)</label><input type="number" value="${feed.height}" min="5" max="30" onchange="updateRSSConfig(${i}, 'height', parseInt(this.value))"></div>
-                    </div>
-                    <div class="form-group" style="flex-direction: row; gap: 10px; align-items: center;">
-                        <div style="flex: 1;"><label>Velocidad (seg)</label><input type="number" value="${feed.speed}" min="5" max="60" onchange="updateRSSConfig(${i}, 'speed', parseInt(this.value))"></div>
-                        <div style="flex: 1;"><label>Dirección</label>
-                            <select onchange="updateRSSConfig(${i}, 'direction', this.value)">
-                                <option value="left" ${feed.direction === 'left' ? 'selected' : ''}>Izq</option>
-                                <option value="right" ${feed.direction === 'right' ? 'selected' : ''}>Der</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            updatePreview();
+                    <div class="rss-status" id="rss-status-${i}"></div>
+                </div>`).join('');
+            renderRSSUsage();
         }
-
-        function updateRSSConfig(index, key, value) {
-            if (key === 'height' || key === 'active') {
-                let totalHeight = 0;
-                db.rss.forEach((f, i) => {
-                    if (i === index && key === 'height') totalHeight += value;
-                    else if (f.active && i !== index) totalHeight += f.height;
-                });
-                if (totalHeight > 50) {
-                    alert("La suma de las alturas activas no puede superar 50vh.");
-                    renderAdmin();
-                    return;
-                }
+        function fitSizes(p) {
+            let changed = false;
+            const tot = () => db.rss.reduce((a, g) => a + (g.active ? g.size * UNIT : 0), 0);
+            while (tot() > MAXVH) {
+                let t = null;
+                db.rss.forEach((g, j) => { if (g.active && j !== p && g.size > 1 && (!t || g.size > t.size)) t = g; });
+                if (!t) break;
+                t.size--; changed = true;
             }
-            db.rss[index][key] = value;
+            return changed;
+        }
+        function updateRSSConfig(i, key, val, rerender) {
+            const f = db.rss[i]; f[key] = val;
+            let changed = false;
+            if (key === 'size') {
+                const others = db.rss.reduce((a, g, j) => a + (g.active && j !== i ? g.size * UNIT : 0), 0);
+                const max = Math.max(1, Math.floor((MAXVH - others) / UNIT));
+                if (f.size > max) { f.size = max; const el = document.getElementById('sz-' + i); if (el) el.value = max; }
+            }
+            if (key === 'size' || (key === 'active' && val)) changed = fitSizes(i);
             saveDB();
+            if (rerender || changed) renderRSSInputs(); else renderRSSUsage();
             updatePreview();
         }
+        async function testFeed(i) {
+            const f = db.rss[i], el = document.getElementById('rss-status-' + i);
+            el.style.color = '#718096'; el.textContent = 'Probando…';
+            try {
+                const items = await fetchFeedItems(f.content, f.type);
+                el.style.color = '#2f855a'; el.textContent = `✔ ${items.length} noticias leídas. Ej: ${items[0]}`;
+            } catch (e) { el.style.color = '#c53030'; el.textContent = '✖ No se pudo leer. Revisa la dirección o cambia el formato.'; }
+        }
 
-        function updatePreview() {
-            const prevTicker = document.getElementById('preview-ticker');
-            prevTicker.innerHTML = '';
-            db.rss.forEach(feed => {
-                if(feed.active) {
-                    const div = document.createElement('div');
-                    div.style.backgroundColor = feed.bgColor;
-                    div.style.color = feed.textColor;
-                    div.style.height = `${feed.height}%`; 
-                    div.style.fontSize = `${feed.height * 0.4}px`; 
-                    div.style.overflow = 'hidden';
-                    div.style.whiteSpace = 'nowrap';
-                    div.style.padding = '2px 5px';
-                    div.innerText = feed.type === 'text' ? feed.content : 'Noticias RSS...';
-                    prevTicker.appendChild(div);
-                }
-            });
-            
-            const prevVid = document.getElementById('preview-video');
-            if(db.config.showVideo && db.playlist.length > 0) {
-                prevVid.style.display = 'flex';
-                const media = db.playlist[0];
-                if(media.url.match(/\.(jpeg|jpg|gif|png)$/) || media.url.startsWith('data:image')) {
-                    prevVid.innerHTML = `<img src="${media.url}">`;
-                } else {
-                    prevVid.innerHTML = `<div style="color:#fff;">Video</div>`;
-                }
+        // ---- Lectura de feeds (XML/Atom/JSON) con proxies CORS de respaldo ----
+        function plain(t) { return new DOMParser().parseFromString(String(t), 'text/html').documentElement.textContent.replace(/\s+/g, ' ').trim(); }
+        function parseFeed(txt) {
+            const t = txt.trim(); let titles = [];
+            if (t[0] === '{' || t[0] === '[') {
+                try {
+                    const j = JSON.parse(t);
+                    const arr = Array.isArray(j) ? j : (j.items || j.entries || j.articles || Object.values(j).find(Array.isArray) || []);
+                    titles = (Array.isArray(arr) ? arr : []).map(o => typeof o === 'string' ? o : (o.title || o.headline || o.name || ''));
+                } catch (e) {}
             } else {
-                prevVid.style.display = 'none';
+                const d = new DOMParser().parseFromString(t, 'text/xml');
+                if (!d.querySelector('parsererror')) titles = [...d.querySelectorAll('item > title, entry > title')].map(n => n.textContent);
             }
+            return titles.map(plain).filter(Boolean).slice(0, 30);
+        }
+        async function fetchFeedItems(url, format) {
+            if (!/^https?:\/\//i.test(url || '')) throw new Error('url');
+            const enc = encodeURIComponent(url);
+            const tries = [url, 'https://api.allorigins.win/raw?url=' + enc, 'https://corsproxy.io/?' + enc];
+            if (format !== 'json') tries.push('https://api.rss2json.com/v1/api.json?rss_url=' + enc);
+            for (const u of tries) {
+                try {
+                    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 8000);
+                    const r = await fetch(u, { signal: ctl.signal }); clearTimeout(t);
+                    if (!r.ok) continue;
+                    const items = parseFeed(await r.text());
+                    if (items.length) { try { localStorage.setItem('feedCache:' + url, JSON.stringify(items)); } catch (e) {} return items; }
+                } catch (e) {}
+            }
+            const c = getSafeItem('feedCache:' + url, null);
+            if (c && c.length) return c;
+            throw new Error('feed');
+        }
+
+        // ---- Medios (imagen / video / YouTube) ----
+        function mediaKind(url) {
+            if (/^data:image/.test(url)) return 'image';
+            if (/^data:video/.test(url)) return 'video';
+            if (/youtu\.?be/.test(url)) return 'youtube';
+            const path = url.split(/[?#]/)[0].toLowerCase();
+            if (/\.(jpe?g|png|gif|webp|avif|svg|bmp)$/.test(path)) return 'image';
+            if (/\.(mp4|webm|ogv|ogg|mov|m4v)$/.test(path)) return 'video';
+            return 'auto';
+        }
+        function mediaHTML(url) {
+            const k = mediaKind(url);
+            if (k === 'youtube') {
+                const m = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);
+                return m ? `<iframe class="media-content yt" src="https://www.youtube.com/embed/${m[1]}?autoplay=1&mute=1&controls=0&loop=1&playlist=${m[1]}" allow="autoplay; encrypted-media"></iframe>` : '';
+            }
+            if (k === 'video') return `<video src="${esc(url)}" class="media-content" autoplay muted loop playsinline></video>`;
+            return `<img src="${esc(url)}" class="media-content" onerror="this.outerHTML='<video src=&quot;'+this.src+'&quot; class=&quot;media-content&quot; autoplay muted loop playsinline></video>'">`;
+        }
+
+        // ---- Logo ----
+        function applyLogo(img) {
+            const l = db.config.logo;
+            if (!l || !l.data) { img.style.display = 'none'; return; }
+            if (img.getAttribute('src') !== l.data) img.src = l.data;
+            img.style.display = 'block';
+            img.style.opacity = (100 - (l.transp || 0)) / 100;
+            img.style.top = img.style.bottom = img.style.left = img.style.right = 'auto';
+            if (l.pos[0] === 't') img.style.top = '0'; else img.style.bottom = '0';
+            if (l.pos[1] === 'l') img.style.left = '0'; else img.style.right = '0';
+        }
+        function setLogo(k, v) { const l = db.config.logo; if (!l) return; l[k] = v; saveDB(); renderLogoTab(); updatePreview(); }
+        function handleLogoUpload(e) {
+            const f = e.target.files[0]; if (!f) return;
+            if (f.size > 400 * 1024) { alert('El logo pesa demasiado (máx 400KB).'); e.target.value = ''; return; }
+            const r = new FileReader();
+            r.onload = ev => {
+                const old = db.config.logo || {};
+                db.config.logo = { data: ev.target.result, pos: old.pos || 'br', transp: old.transp || 0 };
+                saveDB(); renderLogoTab(); updatePreview(); e.target.value = '';
+            };
+            r.readAsDataURL(f);
+        }
+        function removeLogo() { delete db.config.logo; saveDB(); renderLogoTab(); updatePreview(); }
+        function renderLogoTab() {
+            const l = db.config.logo, t = l ? (l.transp || 0) : 0;
+            document.getElementById('logo-status').textContent = l ? 'Logo cargado.' : 'Sin logo.';
+            document.querySelectorAll('.corner-grid button').forEach(b => b.classList.toggle('on', !!l && b.dataset.pos === l.pos));
+            document.getElementById('logo-transp').value = t;
+            document.getElementById('logo-tval').textContent = t + '%';
+        }
+
+        // ---- Vista previa: réplica 1920x1080 escalada ----
+        const PV_SKELETON = `<div class="tv-grid" id="pv-grid">
+            <div class="tv-video-area" id="pv-video"><div id="pv-media" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div><img id="pv-logo" class="tv-logo" alt=""></div>
+            <div class="tv-right-col">
+                <div class="tv-clock-area"><div class="weather-widget"><div class="weather-icon">⛅</div><div class="weather-info"><div class="weather-temp">18°C</div><div class="weather-desc">Parcial</div></div></div><div class="clock-widget"><h1>10:45 AM</h1><p>Lunes, 9 de noviembre</p></div></div>
+                <div class="tv-last-call"><div class="tv-green-bar">ÚLTIMO NÚMERO LLAMADO:</div><div class="tv-last-call-content"><h2>A034</h2><div class="last-name">Nombre Cliente</div><p>CONSULTORIO 1</p></div></div>
+                <div class="tv-recent-calls"><div class="tv-green-bar">LLAMADOS RECIENTES</div><ul class="tv-recent-list"><li><span>A033</span><span class="r-name">Cliente</span><span class="r-box">BOX 2</span></li><li><span>A032</span><span class="r-name">Cliente</span><span class="r-box">BOX 1</span></li><li><span>A031</span><span class="r-name">Cliente</span><span class="r-box">BOX 3</span></li></ul></div>
+            </div>
+            <div class="tv-rss-area" id="pv-rss"></div></div>`;
+        function fitPreview() {
+            const w = document.getElementById('pv-wrap'), st = document.getElementById('pv-stage');
+            if (w && st && w.clientWidth) st.style.transform = `scale(${w.clientWidth / 1920})`;
+        }
+        new ResizeObserver(fitPreview).observe(document.getElementById('pv-wrap'));
+        function updatePreview() {
+            const st = document.getElementById('pv-stage'); if (!st) return;
+            if (!st.firstChild) st.innerHTML = PV_SKELETON;
+            const feeds = db.rss.filter(f => f.active), show = db.config.showVideo;
+            const grid = st.querySelector('#pv-grid');
+            grid.classList.toggle('no-video', !show);
+            grid.style.gridTemplateColumns = show ? '2.2fr 1fr' : '1fr';
+            grid.style.gridTemplateRows = feeds.length ? `1fr ${feeds.reduce((a, f) => a + f.size * UNIT, 0) * PX}px` : '1fr';
+            const v = st.querySelector('#pv-video'); v.style.display = show ? 'flex' : 'none';
+            const m = db.playlist[0], key = show + '|' + (m ? m.url : '');
+            if (v.dataset.k !== key) {
+                v.dataset.k = key;
+                st.querySelector('#pv-media').innerHTML = !m ? '<span style="color:#888;font-size:40px">Sin multimedia</span>' : (mediaKind(m.url) === 'youtube' ? '<span style="color:#fff;font-size:60px">▶ YouTube</span>' : mediaHTML(m.url));
+            }
+            applyLogo(st.querySelector('#pv-logo'));
+            const r = st.querySelector('#pv-rss'); r.style.display = feeds.length ? 'flex' : 'none';
+            r.innerHTML = feeds.map(f => {
+                const h = f.size * UNIT * PX;
+                const c = f.type === 'text' ? f.content : ((getSafeItem('feedCache:' + f.content, null) || ['Titulares de noticias del feed…']).slice(0, 4).join('  •  '));
+                return `<div class="rss-line" style="background:${f.bgColor};color:${f.textColor};height:${h}px"><span style="font-size:${h*0.4}px;font-weight:800;text-transform:uppercase;padding:0 20px">${esc(c)}</span></div>`;
+            }).join('');
+            fitPreview();
         }
 
         function sendPushMessage() {
             const msg = document.getElementById('admin-push-msg').value;
             const color = document.getElementById('admin-push-color').value;
             db.pushMessage = { text: msg, color: color };
+            if (msg.trim()) {
+                const log = getSafeItem('msgLog', []);
+                log.push({ id: Date.now(), text: msg.trim(), color, ts: Date.now() });
+                localStorage.setItem('msgLog', JSON.stringify(log.slice(-200)));
+            }
             saveDB();
             document.getElementById('admin-push-status').innerText = msg ? "Mensaje enviado." : "Mensaje borrado.";
             document.getElementById('admin-push-status').style.color = msg ? "#38a169" : "#e53e3e";
@@ -756,7 +889,7 @@
         function addService() {
             const name = document.getElementById('admin-srv-name').value;
             const emoji = document.getElementById('admin-srv-emoji').value || '🏥';
-            if(name) {
+            if(name && !db.services.some(sv => sv.name.trim().toLowerCase() === name.trim().toLowerCase())) {
                 db.services.push({ name, emoji });
                 saveDB(); renderAdmin();
                 document.getElementById('admin-srv-name').value = '';
@@ -768,7 +901,7 @@
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            if (file.size > 500 * 1024) {
+            if (file.size > 500 * 1024) { // 500KB para no llenar el LocalStorage
                 alert("La imagen es muy pesada (máx 500KB). Intenta con una más pequeña o usa URL.");
                 return;
             }
@@ -798,27 +931,34 @@
         }
 
         // --- 2. KIOSCO ---
+        let kioscoStep = 0;
+        let tempCedula = "";
         let activeInput = null;
         let selectedService = null;
 
+        let kioscoReady = false, kioscoBusy = false, kioscoMsgTimer;
+        function showKioscoMsg(t) {
+            const el = document.getElementById('kiosco-msg'); el.textContent = t;
+            clearTimeout(kioscoMsgTimer); kioscoMsgTimer = setTimeout(() => el.textContent = '', 7000);
+        }
         function setupKiosco() {
-            const srvContainer = document.getElementById('kiosco-services-container');
-            srvContainer.innerHTML = db.services.map((srv, i) => `
+            document.getElementById('kiosco-services-container').innerHTML = db.services.map((srv, i) => `
                 <button class="service-btn" onclick="selectService(${i}, this)">
-                    <span class="service-emoji">${srv.emoji}</span>
-                    <span>${srv.name}</span>
-                </button>
-            `).join('');
-
+                    <span class="service-emoji">${esc(srv.emoji)}</span>
+                    <span>${esc(srv.name)}</span>
+                </button>`).join('');
+            selectedService = null;
             const cedulaInput = document.getElementById('kiosco-cedula');
             const nombreInput = document.getElementById('kiosco-nombre');
-            
+            activeInput = cedulaInput;
+            if (kioscoReady) return;
+            kioscoReady = true;
             cedulaInput.addEventListener('focus', () => { activeInput = cedulaInput; });
-            cedulaInput.addEventListener('input', () => {
-                const client = db.clients.find(c => c.cedula === cedulaInput.value);
-                if(client) nombreInput.value = client.nombre;
-            });
             nombreInput.addEventListener('focus', () => { activeInput = nombreInput; });
+            cedulaInput.addEventListener('input', () => {
+                const client = getSafeItem('clients', db.clients).find(c => c.cedula === cedulaInput.value);
+                if (client) nombreInput.value = client.nombre;
+            });
         }
 
         function selectService(index, btn) {
@@ -834,39 +974,64 @@
             if(activeInput) { activeInput.value = activeInput.value.slice(0, -1); activeInput.dispatchEvent(new Event('input')); }
         }
 
-        function kioscoAction() {
-            const cedula = document.getElementById('kiosco-cedula').value;
-            const nombre = document.getElementById('kiosco-nombre').value;
-            
-            if(!cedula) return alert("Ingrese cédula");
-            if(!nombre) return alert("Ingrese nombre");
-            if(!selectedService) return alert("Seleccione un servicio");
-
-            if(!db.clients.find(c => c.cedula === cedula)) {
-                db.clients.push({ cedula, nombre });
+        // Letra única por servicio (según el nombre) y contador diario por letra
+        function servicePrefix(name) {
+            const used = [];
+            for (const sv of db.services) {
+                const letters = sv.name.normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
+                const p = [...letters].find(c => !used.includes(c)) || String.fromCharCode(65 + used.length);
+                used.push(p);
+                if (sv.name === name) return p;
             }
+            return 'A';
+        }
+        function nextTurno(service) {
+            const p = servicePrefix(service), today = new Date().toDateString();
+            let c = getSafeItem('turnCounters', {});
+            if (c.date !== today) c = { date: today };
+            c[p] = (c[p] || 0) + 1;
+            localStorage.setItem('turnCounters', JSON.stringify(c));
+            return p + String(c[p]).padStart(3, '0');
+        }
 
-            const prefix = selectedService === 'Medicina General' ? 'M' : (selectedService === 'Odontología' ? 'O' : 'A');
-            const turnoNum = prefix + String(db.queue.length + 1).padStart(3, '0');
-            
+        function kioscoAction() {
+            const cedulaEl = document.getElementById('kiosco-cedula'), nombreEl = document.getElementById('kiosco-nombre');
+            const cedula = cedulaEl.value.trim(), nombre = nombreEl.value.trim();
+            if (!cedula) return alert("Ingrese cédula");
+            if (!nombre) return alert("Ingrese nombre");
+            if (!selectedService) return alert("Seleccione un servicio");
+
+            if (kioscoBusy) return;
+            db.queue = getSafeItem('queue', []);
+            db.clients = getSafeItem('clients', []);
+            // Una persona con turno pendiente (en cualquier servicio) no puede pedir otro
+            const ced = cedula.replace(/\s+/g, '');
+            const dup = db.queue.find(q => String(q.cedula).replace(/\s+/g, '') === ced);
+            if (dup) { showKioscoMsg(`Ya tiene el turno ${dup.turno} en ${dup.servicio}. Por favor espere a ser llamado.`); return; }
+            kioscoBusy = true;
+            if (!db.clients.find(c => c.cedula === cedula)) db.clients.push({ cedula, nombre });
+
+            const turnoNum = nextTurno(selectedService);
             db.queue.push({ cedula, nombre, servicio: selectedService, turno: turnoNum, timestamp: Date.now() });
-            saveDB();
+            saveDB('queue', 'clients');
 
-            document.getElementById('kiosco-form').style.display = 'none';
-            document.getElementById('virtual-keyboard').style.display = 'none';
+            const form = document.querySelector('#kiosco-screen .kiosco-top');
+            const kb = document.getElementById('virtual-keyboard');
             const ticket = document.getElementById('ticket-display');
-            ticket.style.display = 'block';
+            form.style.display = 'none';
+            kb.style.display = 'none';
             document.getElementById('ticket-number').innerText = turnoNum;
+            ticket.style.display = 'block';
 
             setTimeout(() => {
                 ticket.style.display = 'none';
-                document.getElementById('kiosco-form').style.display = 'block';
-                document.getElementById('virtual-keyboard').style.display = 'flex';
-                document.getElementById('kiosco-cedula').value = '';
-                document.getElementById('kiosco-nombre').value = '';
+                form.style.display = 'flex';
+                kb.style.display = 'flex';
+                cedulaEl.value = ''; nombreEl.value = '';
                 document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('selected'));
                 selectedService = null;
-                activeInput = null;
+                activeInput = cedulaEl;
+                kioscoBusy = false;
             }, 5000);
         }
 
@@ -876,19 +1041,32 @@
         let selectedHistoryId = null;
 
         function setupOperator() {
+            // Cargar select de servicios
             const select = document.getElementById('op-service-select');
             select.innerHTML = db.services.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
 
             if(opInterval) clearInterval(opInterval);
-            opInterval = setInterval(async () => {
-                try {
-                    const data = await loadData(); 
-                    if(JSON.stringify(data.pushMessage) !== JSON.stringify(db.pushMessage)) {
-                        db.pushMessage = data.pushMessage;
-                        renderPushMessage();
-                    }
-                } catch(e) {}
-            }, 5000); 
+            opInterval = setInterval(() => {
+                const lg = localStorage.getItem('msgLog') || '';
+                if (lg !== lastMsgLog) { lastMsgLog = lg; renderMsgLog(); }
+                const newMsg = getSafeItem('pushMessage', { text: "", color: "red" });
+                if(JSON.stringify(newMsg) !== JSON.stringify(db.pushMessage)) {
+                    db.pushMessage = newMsg;
+                    renderPushMessage();
+                }
+            }, 2000);
+        }
+
+        let opMsgShown = 3, lastMsgLog = null;
+        function renderMsgLog() {
+            const el = document.getElementById('op-msg-log'), today = new Date().toDateString();
+            const all = getSafeItem('msgLog', []).filter(m => new Date(m.ts).toDateString() === today).reverse();
+            if (!all.length) { el.style.display = 'none'; return; }
+            el.style.display = 'block';
+            const dot = { red: '🔴', yellow: '🟡', green: '🟢' };
+            el.innerHTML = `<div style="padding:6px 12px;background:#f7fafc;font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase">Mensajes de hoy (${all.length})</div>
+                <div class="msg-list">${all.slice(0, opMsgShown).map(m => `<div class="msg-item"><span>${dot[m.color] || '🟢'}</span><span style="flex:1">${esc(m.text)}</span><span style="color:#a0aec0;font-size:.8rem">${new Date(m.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>`).join('')}</div>
+                ${all.length > opMsgShown ? `<button class="msg-more" onclick="opMsgShown += 3; renderMsgLog()">Ver anteriores (${all.length - opMsgShown})</button>` : ''}`;
         }
 
         function renderPushMessage() {
@@ -913,6 +1091,9 @@
                 document.getElementById('op-panel').classList.remove('hidden');
                 document.getElementById('op-welcome').innerText = "Hola, " + op.name;
                 document.getElementById('op-box-name').innerText = op.box;
+                // Tarjeta de 'Llamar Turno' siempre a la derecha por defecto
+                document.getElementById('op-panel').appendChild(document.getElementById('panel-main'));
+                opMsgShown = 3; renderMsgLog();
                 renderPushMessage();
                 renderOperatorHistory();
             } else {
@@ -966,11 +1147,12 @@
         document.addEventListener('input', (e) => {
             if(e.target.id === 'op-notes-area' && selectedHistoryId !== null) {
                 const item = db.opHistory.find(h => h.id === selectedHistoryId);
-                if(item) { item.notes = e.target.value; saveDB(); }
+                if(item) { item.notes = e.target.value; saveDB('opHistory'); }
             }
         });
 
         function callNext() {
+            db.queue = getSafeItem('queue', []);
             const servicio = document.getElementById('op-service-select').value;
             const nextIndex = db.queue.findIndex(u => u.servicio === servicio);
             
@@ -985,7 +1167,7 @@
             const historyId = Date.now();
             db.opHistory.push({ id: historyId, pin: currentOperator.pin, turno: user.turno, name: user.nombre, time: timeString, notes: "" });
             
-            saveDB();
+            saveDB('queue', 'activeCall', 'opHistory');
             selectedHistoryId = historyId;
             renderOperatorHistory();
             selectHistory(historyId);
@@ -1010,6 +1192,8 @@
             document.querySelectorAll('.op-panel').forEach(p => p.classList.remove('drag-over'));
         }
 
+        document.addEventListener('dragend', () => document.querySelectorAll('.op-panel').forEach(p => p.classList.remove('drag-over')));
+
         // --- 4. PANTALLA CLIENTES (TV) ---
         let screenInterval, audioEnabled = false, currentMediaIndex = 0, mediaTimer, isCalling = false;
 
@@ -1022,13 +1206,17 @@
             startPlaylist();
             renderTVRSS();
             fetchWeather();
+            setInterval(() => { applyVisualConfig(); renderTVRSS(); }, 15 * 60 * 1000);
         }
 
         function applyVisualConfig() {
+            db.config = getSafeItem('config', db.config);
             const zonaVideo = document.getElementById('zona-video');
             const zonaDerecha = document.getElementById('zona-derecha');
             const tvGrid = document.getElementById('tv-grid');
 
+            tvGrid.classList.toggle('no-video', !db.config.showVideo);
+            applyLogo(document.getElementById('tv-logo'));
             if (db.config.showVideo) {
                 zonaVideo.style.display = 'flex';
                 tvGrid.style.gridTemplateColumns = '2.2fr 1fr';
@@ -1039,6 +1227,7 @@
         }
 
         function startPlaylist() {
+            db.playlist = getSafeItem('playlist', db.playlist);
             if (db.playlist.length === 0) return;
 
             function showNextMedia() {
@@ -1047,14 +1236,7 @@
                 const media = db.playlist[currentMediaIndex];
                 container.innerHTML = '';
 
-                if (media.url.includes('youtube.com') || media.url.includes('youtu.be')) {
-                    const videoId = media.url.split('v=')[1] || media.url.split('/').pop();
-                    container.innerHTML = `<iframe class="media-content" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
-                } else if (media.url.match(/\.(jpeg|jpg|gif|png)$/) || media.url.startsWith('data:image')) {
-                    container.innerHTML = `<img src="${media.url}" class="media-content">`;
-                } else {
-                    container.innerHTML = `<video src="${media.url}" class="media-content" autoplay muted loop></video>`;
-                }
+                container.innerHTML = mediaHTML(media.url);
 
                 mediaTimer = setTimeout(() => {
                     currentMediaIndex = (currentMediaIndex + 1) % db.playlist.length;
@@ -1090,70 +1272,50 @@
             }
         }
 
-        async function renderTVRSS() {
-            const rssArea = document.getElementById('zona-rss');
-            rssArea.innerHTML = '';
-            
-            const activeFeeds = db.rss.filter(f => f.active);
-            if (activeFeeds.length === 0) {
-                rssArea.style.display = 'none';
-                document.getElementById('tv-grid').style.gridTemplateRows = '1fr';
-                return;
-            }
+        function startMarquee(span, line, feed) {
+            span.style.animation = 'none'; void span.offsetWidth;
+            const lw = line.clientWidth, dur = (span.offsetWidth + lw) / (30 + feed.pace * 25);
+            span.style.setProperty('--from', lw + 'px');
+            span.style.animation = `marquee-left ${dur}s linear infinite ${feed.direction === 'right' ? 'reverse' : 'normal'}`;
+        }
 
-            rssArea.style.display = 'flex';
-            let totalHeight = 0;
-            activeFeeds.forEach(f => totalHeight += f.height);
-            document.getElementById('tv-grid').style.gridTemplateRows = `1fr ${totalHeight}vh`;
-
-            for (let i = 0; i < db.rss.length; i++) {
-                const feed = db.rss[i];
-                if (!feed.active) continue;
-
-                const lineDiv = document.createElement('div');
-                lineDiv.className = 'rss-line';
-                lineDiv.style.backgroundColor = feed.bgColor;
-                lineDiv.style.color = feed.textColor;
-                lineDiv.style.height = `${feed.height}vh`;
-                
-                const textSpan = document.createElement('span');
-                textSpan.className = 'rss-text';
-                textSpan.style.fontSize = `${feed.height * 0.4}vh`;
-                textSpan.style.animationDirection = feed.direction === 'right' ? 'reverse' : 'normal';
-                textSpan.style.animationDuration = `${feed.speed}s`;
-                
-                let contentText = feed.content;
-                if(feed.type === 'rss') {
-                    textSpan.innerText = "Cargando noticias...";
-                    lineDiv.appendChild(textSpan);
-                    rssArea.appendChild(lineDiv);
-                    try {
-                        const res = await fetch(feed.content);
-                        const data = await res.json();
-                        if(data.items && data.items.length > 0) {
-                            contentText = data.items.map(item => item.title).join('  •  ');
-                        } else {
-                            contentText = "No hay noticias en este feed.";
-                        }
-                    } catch(e) { contentText = "Error al cargar el RSS."; }
-                    textSpan.innerText = contentText;
-                } else {
-                    textSpan.innerText = contentText;
-                    lineDiv.appendChild(textSpan);
-                    rssArea.appendChild(lineDiv);
+        function renderTVRSS() {
+            const area = document.getElementById('zona-rss'), grid = document.getElementById('tv-grid');
+            db.rss = normRSS(getSafeItem('rss', db.rss));
+            const feeds = db.rss.filter(f => f.active);
+            area.innerHTML = '';
+            if (!feeds.length) { area.style.display = 'none'; grid.style.gridTemplateRows = '1fr'; return; }
+            area.style.display = 'flex';
+            grid.style.gridTemplateRows = `1fr ${feeds.reduce((a, f) => a + f.size * UNIT, 0)}vh`;
+            feeds.forEach(feed => {
+                const line = document.createElement('div');
+                line.className = 'rss-line';
+                line.style.cssText = `background:${feed.bgColor};color:${feed.textColor};height:${feed.size * UNIT}vh`;
+                const span = document.createElement('span');
+                span.className = 'rss-text';
+                span.style.fontSize = `${feed.size * UNIT * 0.4}vh`;
+                line.appendChild(span); area.appendChild(line);
+                const run = txt => { span.textContent = txt; startMarquee(span, line, feed); };
+                if (feed.type === 'text') run(feed.content);
+                else {
+                    run('Cargando noticias…');
+                    fetchFeedItems(feed.content, feed.type).then(it => run(it.join('   •   '))).catch(() => run('No se pudo cargar el feed.'));
                 }
-            }
+            });
         }
 
         const styleSheet = document.createElement("style");
-        styleSheet.innerText = `@keyframes marquee-left { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }`;
+        // Fix de la animación: Empieza en 100% del ancho y va a -100% del texto
+        styleSheet.innerText = `
+            @keyframes marquee-left { from { transform: translateX(var(--from, 100vw)); } to { transform: translateX(-100%); } }
+        `;
         document.head.appendChild(styleSheet);
 
         function initScreenListeners() {
             if(screenInterval) clearInterval(screenInterval);
             updateClock();
             setInterval(updateClock, 1000);
-            screenInterval = setInterval(checkCalls, 4000); 
+            screenInterval = setInterval(checkCalls, 1000);
             
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('date-display').innerText = new Date().toLocaleDateString('es-ES', options).toUpperCase();
@@ -1165,18 +1327,11 @@
         }
 
         let lastProcessedCall = 0;
-        async function checkCalls() {
-            try {
-                const response = await fetch(`${API_URL}?action=getAll`);
-                const data = await response.json();
-                const newActiveCall = data.activeCall;
-                
-                if(newActiveCall && newActiveCall.timestamp > lastProcessedCall) {
-                    lastProcessedCall = newActiveCall.timestamp;
-                    processNewCall(newActiveCall);
-                }
-            } catch(e) {
-                console.log("Polling error", e);
+        function checkCalls() {
+            const newActiveCall = getSafeItem('activeCall', null);
+            if(newActiveCall && newActiveCall.timestamp > lastProcessedCall) {
+                lastProcessedCall = newActiveCall.timestamp;
+                processNewCall(newActiveCall);
             }
         }
 
