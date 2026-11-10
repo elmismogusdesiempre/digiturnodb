@@ -923,7 +923,7 @@
 
             let r;
             try { r = await apiRegister(cedula, nombre, selectedService); }
-            catch (e) { kioscoBusy = false; showKioscoMsg('No hay conexión con el servidor. Intente de nuevo.'); return; }
+            catch (e) { console.error('registerTurn:', e); kioscoBusy = false; showKioscoMsg('No se pudo generar el turno: ' + e.message); return; }
             if (r.code === 'DUPLICATE') { kioscoBusy = false; showKioscoMsg(`Ya tiene el turno ${r.turno} en ${r.servicio}. Por favor espere a ser llamado.`); return; }
             if (!r.ok) { kioscoBusy = false; showKioscoMsg(r.message || 'No se pudo generar el turno.'); return; }
 
@@ -991,9 +991,11 @@
             }
         }
 
-        function loginOperator() {
-            const pin = document.getElementById('op-pin').value;
-            const op = db.operators.find(o => o.pin === pin);
+        async function loginOperator() {
+            const pin = String(document.getElementById('op-pin').value).trim();
+            const findOp = () => db.operators.find(o => String(o.pin).trim() === pin);
+            let op = findOp();
+            if (!op) { document.getElementById('op-error').innerText = "Verificando…"; await loadData(); op = findOp(); }
             if(op) {
                 currentOperator = op;
                 document.getElementById('op-login').classList.add('hidden');
@@ -1005,7 +1007,7 @@
                 renderPushMessage();
                 renderOperatorHistory();
             } else {
-                document.getElementById('op-error').innerText = "PIN Incorrecto";
+                document.getElementById('op-error').innerText = dbOffline ? "Sin conexión con la base de datos" : "PIN Incorrecto";
             }
         }
 
@@ -1022,7 +1024,7 @@
 
         function renderOperatorHistory() {
             const list = document.getElementById('op-history-list');
-            const myHistory = db.opHistory.filter(h => h.pin === currentOperator.pin);
+            const myHistory = db.opHistory.filter(h => String(h.pin) === String(currentOperator.pin));
             
             if(myHistory.length === 0) {
                 list.innerHTML = `<li style="color: #a0aec0; text-align: center; border: none;">No has llamado turnos aún.</li>`;
