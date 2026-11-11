@@ -233,6 +233,8 @@
     </style>
 </head>
 <body>
+<div id="cloud-status" role="status" style="position:fixed;bottom:5px;right:8px;z-index:20000;background:#234e52;color:white;padding:5px 10px;border-radius:6px;font:12px sans-serif;pointer-events:none">Conectando con Supabase…</div>
+<dialog id="admin-auth" style="margin:auto;border:0;border-radius:15px;padding:30px;max-width:420px;width:90%"><form onsubmit="loginAdmin(event)"><h2>Acceso Administrador</h2><label for="admin-password">Contraseña</label><input id="admin-password" type="password" autocomplete="current-password" required style="width:100%;padding:12px;margin:15px 0"><p id="admin-auth-error" style="color:#c53030"></p><button class="btn" type="submit">Ingresar</button><button class="btn" type="button" style="margin-top:8px;background:#718096" onclick="document.getElementById('admin-auth').close()">Cancelar</button></form></dialog>
 
     <div id="secret-trigger" onmousedown="startHold()" onmouseup="cancelHold()" onmouseleave="cancelHold()" ontouchstart="startHold()" ontouchend="cancelHold()"></div>
 
@@ -259,12 +261,12 @@
             <button class="tab-btn" onclick="openTab('tab-logo')">🏷️ Logo</button>
             <button class="tab-btn" onclick="openTab('tab-services')">🏥 Servicios</button>
             <button class="tab-btn" onclick="openTab('tab-rss')">📰 Tickers RSS</button>
-            <button class="tab-btn" onclick="toggleHelp()" style="margin-top: auto; color: #e53e3e;">❓ Ayuda</button>
+            <button class="tab-btn" onclick="openTab('tab-business')">⚙️ Negocio y acceso</button><button class="tab-btn" onclick="logoutAdmin()">Salir de administración</button><button class="tab-btn" onclick="toggleHelp()" style="margin-top: auto; color: #e53e3e;">❓ Ayuda</button>
         </div>
         
         <!-- Contenido Central -->
         <div class="admin-content-area">
-            <!-- Tab Operadores -->
+            <div id="tab-business" class="tab-content"><h2>Negocio y acceso</h2><div class="form-group"><label>Tipo de negocio</label><select id="business-type"><option value="clinic">🏥 Clínica</option><option value="hospital">🏨 Hospital</option><option value="bank">🏦 Banco</option><option value="customer">🤝 Servicio al cliente</option></select></div><div class="form-group"><label>Nombre del negocio</label><input id="business-name" maxlength="120"></div><button class="btn" onclick="applyBusiness()">Aplicar perfil de negocio</button><p style="margin:15px 0">Cambia servicios, iconos y bienvenida. Los turnos e historial se conservan.</p><form onsubmit="changeAdminPassword(event)"><h3>Cambiar contraseña de administrador</h3><div class="form-group"><label>Nueva contraseña (mínimo 10 caracteres)</label><input id="new-admin-password" type="password" autocomplete="new-password" minlength="10" required></div><button class="btn">Cambiar contraseña</button></form></div><!-- Tab Operadores -->
             <div id="tab-ops" class="tab-content active">
                 <h2>Operadores</h2>
                 <div style="display: flex; gap: 10px;">
@@ -432,7 +434,7 @@
     <div id="operador-screen" class="screen">
         <div class="operador-box" id="op-login" style="margin: auto; max-width: 500px; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
             <h1 style="color: var(--primary); margin-bottom: 20px; text-align: center;">Acceso Operador</h1>
-            <input type="password" id="op-pin" class="kiosco-input" placeholder="Ingrese PIN">
+            <label for="op-box">Seleccione su box</label><select id="op-box" class="kiosco-input"></select><input inputmode="numeric" maxlength="4" autocomplete="off" type="password" id="op-pin" class="kiosco-input" placeholder="Ingrese PIN">
             <button class="kiosco-btn" onclick="loginOperator()">Ingresar</button>
             <p id="op-error" style="color: #e53e3e; margin-top: 10px; font-weight: bold; text-align: center;"></p>
         </div>
@@ -626,7 +628,7 @@
             const opList = document.getElementById('admin-op-list');
             opList.innerHTML = db.operators.map((op, index) => `
                 <div class="list-item">
-                    <span><strong>${op.name}</strong> (${op.box}) - PIN: ${op.pin}</span>
+                    <span><strong>${esc(op.name)}</strong> (${esc(op.box)}) - PIN: ${esc(op.pin)}</span>
                     <button class="btn-danger" onclick="removeOperator(${index})">X</button>
                 </div>
             `).join('');
@@ -645,7 +647,7 @@
             const srvList = document.getElementById('admin-srv-list');
             srvList.innerHTML = db.services.map((srv, i) => `
                 <div class="list-item">
-                    <span><strong>${srv.emoji} ${srv.name}</strong></span>
+                    <span><strong>${esc(srv.emoji)} ${esc(srv.name)}</strong></span>
                     <button class="btn-danger" onclick="removeService(${i})">X</button>
                 </div>
             `).join('');
@@ -1043,7 +1045,7 @@
         function setupOperator() {
             // Cargar select de servicios
             const select = document.getElementById('op-service-select');
-            select.innerHTML = db.services.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            select.innerHTML = db.services.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');
 
             if(opInterval) clearInterval(opInterval);
             opInterval = setInterval(() => {
@@ -1066,7 +1068,7 @@
             const dot = { red: '🔴', yellow: '🟡', green: '🟢' };
             el.innerHTML = `<div style="padding:6px 12px;background:#f7fafc;font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase">Mensajes de hoy (${all.length})</div>
                 <div class="msg-list">${all.slice(0, opMsgShown).map(m => `<div class="msg-item"><span>${dot[m.color] || '🟢'}</span><span style="flex:1">${esc(m.text)}</span><span style="color:#a0aec0;font-size:.8rem">${new Date(m.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>`).join('')}</div>
-                ${all.length > opMsgShown ? `<button class="msg-more" onclick="opMsgShown += 3; renderMsgLog()">Ver anteriores (${all.length - opMsgShown})</button>` : ''}`;
+                ${all.length > opMsgShown ? `<button class="msg-more" onclick="opMsgShown += 3; renderMsgLog(); savePreferences()">Ver anteriores (${all.length - opMsgShown})</button>` : ''}`;
         }
 
         function renderPushMessage() {
@@ -1124,10 +1126,10 @@
             list.innerHTML = myHistory.map(h => `
                 <li onclick="selectHistory(${h.id})" class="${selectedHistoryId === h.id ? 'active' : ''}">
                     <div class="hist-header">
-                        <span>${h.turno}</span>
+                        <span>${esc(h.turno)}</span>
                         <span style="color: #a0aec0; font-size: 0.8rem;">${h.time}</span>
                     </div>
-                    <div class="hist-name">${h.name}</div>
+                    <div class="hist-name">${esc(h.name)}</div>
                 </li>
             `).join('');
         }
@@ -1345,7 +1347,7 @@
             
             const list = document.getElementById('recent-list');
             const newLi = document.createElement('li');
-            newLi.innerHTML = `<span>${call.turno}</span> <span class="r-name">${call.nombre}</span> <span class="r-box">${call.box.toUpperCase()}</span>`;
+            newLi.innerHTML = `<span>${call.turno}</span> <span class="r-name">${esc(call.nombre)}</span> <span class="r-box">${esc(call.box.toUpperCase())}</span>`;
             list.insertBefore(newLi, list.firstChild);
             if(list.children.length > 4) list.removeChild(list.lastChild);
 
@@ -1357,7 +1359,7 @@
 
             if(audioEnabled && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const text = `Turno ${call.turno.split('').join(' ')}, ${call.nombre}, pasar a ${call.box}`;
+                const text = `Turno ${call.turno.split('').join(' ')}, ${esc(call.nombre)}, pasar a ${call.box}`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'es-ES';
                 utterance.rate = 0.85;
@@ -1371,5 +1373,114 @@
             }, 8000);
         }
     </script>
+<script>
+// Adaptador Supabase: conserva las pantallas y sus controles originales.
+const API_URL='https://phqbcfjbsdibushvolqh.supabase.co/functions/v1/digiturno';
+let cloudToken=sessionStorage.getItem('dt-session')||'', cloudUser=null, cloudReady=false, cloudPolling=false;
+let cloudVersions={}, cloudBaseline={}, cloudPending=0, cloudSaving=Promise.resolve(), cloudNoteTimer, cloudRequestId=null, cloudCallId=null;
+const sharedKeys=['operators','queue','activeCall','playlist','rss','services','clients','config','pushMessage','opHistory','msgLog','turnCounters'];
+let noteChain=Promise.resolve(),noteDirty=false;
+let cloudMemory={},pendingServiceNames=[],cloudCalls=[],callBacklog=[],seenCalls=new Set();
+const localSafeItem=getSafeItem;
+getSafeItem=(key,fallback)=>sharedKeys.includes(key)?(cloudMemory[key]??fallback):localSafeItem(key,fallback);
+function connectionStatus(text,bad=false){const el=document.getElementById('cloud-status');el.textContent=text;el.style.background=bad?'#9b2c2c':'#234e52';}
+async function cloudApi(action,payload={},token=cloudToken){
+ const ctl=new AbortController(), timer=setTimeout(()=>ctl.abort(),20000);
+ try{const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload,token}),signal:ctl.signal});const data=await response.json();if(!response.ok||data.error)throw new Error(data.error||'Error de conexión');return data;}
+ catch(e){connectionStatus('Sin confirmar · '+(e.name==='AbortError'?'Tiempo de espera agotado':e.message),true);throw e;}
+ finally{clearTimeout(timer);}
+}
+function newRequestId(){return Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');}
+function showCloudError(e){alert(e.message||'No se pudo guardar. Verifique la conexión.');}
+function applyBrand(){document.documentElement.style.setProperty('--primary',db.config.primaryColor||'#0056b3');const heading=document.querySelector('#kiosco-screen h1');heading.textContent='Bienvenido a '+(db.config.businessName||'nuestro centro');document.title=(db.config.businessName||'Digiturno')+' · Turnos';}
+async function refreshCloud(force=false){
+ if(cloudPolling||cloudPending)return;
+ cloudPolling=true;
+ try{
+  const snap=await cloudApi('snapshot');
+  const previous={services:JSON.stringify(db.services),playlist:JSON.stringify(db.playlist),rss:JSON.stringify(db.rss),config:JSON.stringify(db.config)};
+  if(cloudPending)return;
+  for(const key of sharedKeys)if(key in snap){if(key==='opHistory'&&document.activeElement?.id==='op-notes-area')continue;db[key]=snap[key];cloudMemory[key]=snap[key];}
+  pendingServiceNames=snap.pendingServices||[];cloudCalls=snap.calls||[];cloudVersions=snap.versions||{};
+  for(const key of ['playlist','rss','services','config','pushMessage','msgLog'])cloudBaseline[key]=JSON.stringify(db[key]);
+  cloudReady=true;applyBrand();
+  const servicesChanged=previous.services!==JSON.stringify(db.services);
+  if(servicesChanged&&document.getElementById('kiosco-screen').classList.contains('active')){const selected=selectedService;setupKiosco();const i=db.services.findIndex(s=>s.name===selected);if(i>=0)selectService(i,document.querySelectorAll('.service-btn')[i]);}
+  if(servicesChanged||pendingServiceNames.length){const select=document.getElementById('op-service-select'),value=select.value;fillServiceSelect(select,value);}
+  if(document.getElementById('pantalla-screen').classList.contains('active')){applyVisualConfig();if(previous.rss!==JSON.stringify(db.rss))renderTVRSS();if(previous.playlist!==JSON.stringify(db.playlist)&&audioEnabled&&!isCalling)startPlaylist();}
+  if(currentOperator){renderOperatorHistory();renderPushMessage();renderMsgLog();}
+  if(force&&document.getElementById('admin-screen').classList.contains('active'))renderAdmin();
+  connectionStatus('Supabase conectado · '+(cloudPending?'Guardando…':'Sincronizado'));
+ }catch(e){/* El estado indica el fallo; nunca se emiten turnos locales. */}finally{cloudPolling=false;}
+}
+function fillServiceSelect(select,value){const options=[...db.services];for(const name of pendingServiceNames)if(!options.some(s=>s.name===name))options.push({name});for(const h of db.opHistory||[])if(!options.some(s=>s.name===h.servicio)&&h.servicio)options.push({name:h.servicio});select.innerHTML=options.map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');if(options.some(s=>s.name===value))select.value=value;}
+saveDB=function(...keys){
+ if(keys.includes('opHistory')){clearTimeout(cloudNoteTimer);const id=selectedHistoryId,item=db.opHistory.find(h=>h.id===id);if(item){const notes=item.notes;noteDirty=true;connectionStatus('Nota pendiente…');cloudNoteTimer=setTimeout(()=>{cloudNoteTimer=null;enqueueNote(id,notes).catch(showCloudError);},500);}return;}
+ const cfg=['playlist','rss','services','config','pushMessage','msgLog'];const patch={};
+ for(const key of (keys.length?keys:cfg))if(cfg.includes(key)&&JSON.stringify(db[key])!==cloudBaseline[key])patch[key]=structuredClone(db[key]);
+ if(!Object.keys(patch).length)return cloudSaving;
+ for(const key in patch)cloudBaseline[key]=JSON.stringify(patch[key]);
+ cloudPending++;connectionStatus('Guardando en Supabase…');
+ cloudSaving=cloudSaving.then(async()=>{try{const result=await cloudApi('save',{patch,versions:cloudVersions});cloudVersions=result.versions;for(const key in patch)cloudMemory[key]=patch[key];connectionStatus('Cambios guardados en Supabase');return true;}catch(e){for(const key in patch)delete cloudBaseline[key];showCloudError(e);return false;}finally{cloudPending--;if(!cloudPending)await refreshCloud();}});
+ return cloudSaving;
+};
+const originalEnterMode=enterMode;
+enterMode=async function(mode){
+ if(!cloudReady){await refreshCloud();if(!cloudReady)return alert('No hay conexión con Supabase. Intente de nuevo.');}
+ if(mode==='admin'&&cloudUser?.role!=='admin'){document.getElementById('admin-auth').showModal();document.getElementById('admin-password').focus();return;}
+ originalEnterMode(mode);
+ if(mode==='kiosco')document.getElementById('kiosco-cedula').focus();
+ if(mode==='operador'){const select=document.getElementById('op-box');select.innerHTML=db.operators.map(o=>`<option value="${esc(o.box)}">${esc(o.box)} · ${esc(o.name)}</option>`).join('');}
+};
+async function loginAdmin(event){event.preventDefault();const error=document.getElementById('admin-auth-error');try{const r=await cloudApi('login',{box:'admin',password:document.getElementById('admin-password').value},'');cloudToken=r.token;cloudUser=r.operator;sessionStorage.setItem('dt-session',cloudToken);document.getElementById('admin-password').value='';document.getElementById('admin-auth').close();await refreshCloud();originalEnterMode('admin');}catch(e){error.textContent=e.message;}}
+loginOperator=async function(){try{const r=await cloudApi('login',{box:document.getElementById('op-box').value,password:document.getElementById('op-pin').value},'');cloudToken=r.token;cloudUser=r.operator;currentOperator=r.operator;sessionStorage.setItem('dt-session',cloudToken);document.getElementById('op-pin').value='';document.getElementById('op-error').textContent='';document.getElementById('op-login').classList.add('hidden');document.getElementById('op-panel').classList.remove('hidden');document.getElementById('op-welcome').textContent='Hola, '+currentOperator.name;document.getElementById('op-box-name').textContent=currentOperator.box;await refreshCloud();restorePreferences(r.preferences);renderOperatorHistory();}catch(e){document.getElementById('op-error').textContent=e.message;}};
+const originalLogout=logoutOperator;
+logoutOperator=async function(){await flushNotes();await cloudApi('logout').catch(()=>{});cloudToken='';cloudUser=null;sessionStorage.removeItem('dt-session');originalLogout();db.opHistory=[];db.pushMessage={text:'',color:'red'};cloudMemory.opHistory=[];};
+async function logoutAdmin(){await cloudSaving;await cloudApi('logout').catch(()=>{});cloudToken='';cloudUser=null;sessionStorage.removeItem('dt-session');location.reload();}
+async function changeAdminPassword(event){event.preventDefault();try{await cloudApi('password',{password:document.getElementById('new-admin-password').value});alert('Clave actualizada. Ingrese nuevamente.');await logoutAdmin();}catch(e){showCloudError(e);}}
+const originalSetupKiosco=setupKiosco;
+setupKiosco=function(){originalSetupKiosco();for(const id of ['kiosco-cedula','kiosco-nombre']){const el=document.getElementById(id);el.readOnly=false;el.setAttribute('inputmode','none');} };
+typeChar=function(char){if(!activeInput)return;const start=activeInput.selectionStart??activeInput.value.length,end=activeInput.selectionEnd??start;activeInput.setRangeText(char,start,end,'end');activeInput.dispatchEvent(new Event('input',{bubbles:true}));activeInput.focus();};
+deleteChar=function(){if(!activeInput)return;const start=activeInput.selectionStart??activeInput.value.length,end=activeInput.selectionEnd??start;if(start!==end)activeInput.setRangeText('',start,end,'end');else if(start>0)activeInput.setRangeText('',start-1,start,'end');activeInput.dispatchEvent(new Event('input',{bubbles:true}));activeInput.focus();};
+document.getElementById('virtual-keyboard').addEventListener('pointerdown',e=>{if(e.target.closest('.key'))e.preventDefault();});
+document.addEventListener('keydown',e=>{if(e.isComposing)return;if(e.key==='Enter'&&['kiosco-cedula','kiosco-nombre'].includes(e.target.id)){e.preventDefault();if(e.target.id==='kiosco-cedula')document.getElementById('kiosco-nombre').focus();else kioscoAction();}if(e.key==='Enter'&&e.target.id==='op-pin'){e.preventDefault();loginOperator();}});
+kioscoAction=async function(){
+ const cedula=document.getElementById('kiosco-cedula').value.trim(),nombre=document.getElementById('kiosco-nombre').value.trim();if(!cedula)return alert('Ingrese cédula');if(!nombre)return alert('Ingrese nombre');if(!selectedService)return alert('Seleccione un servicio');if(kioscoBusy)return;
+ kioscoBusy=true;document.getElementById('btn-kiosco-action').disabled=true;cloudRequestId??=newRequestId();
+ try{const r=await cloudApi('issue',{cedula,nombre,servicio:selectedService,requestId:cloudRequestId});cloudRequestId=null;document.querySelector('#kiosco-screen .kiosco-top').style.display='none';document.getElementById('virtual-keyboard').style.display='none';document.getElementById('ticket-number').textContent=r.ticket.turno;document.getElementById('ticket-display').style.display='block';setTimeout(()=>{document.getElementById('ticket-display').style.display='none';document.querySelector('#kiosco-screen .kiosco-top').style.display='flex';document.getElementById('virtual-keyboard').style.display='flex';document.getElementById('kiosco-cedula').value='';document.getElementById('kiosco-nombre').value='';selectedService=null;document.querySelectorAll('.service-btn').forEach(b=>b.classList.remove('selected'));activeInput=document.getElementById('kiosco-cedula');activeInput.focus();kioscoBusy=false;document.getElementById('btn-kiosco-action').disabled=false;},5000);}catch(e){showKioscoMsg(e.message);kioscoBusy=false;document.getElementById('btn-kiosco-action').disabled=false;if(!/fetch|espera|conexión|Failed|Network|procesar|completar/i.test(e.message))cloudRequestId=null;}
+};
+let nextBusy=false;
+callNext=async function(){if(nextBusy||!currentOperator)return;nextBusy=true;cloudCallId??=newRequestId();try{await flushNotes();const r=await cloudApi('next',{servicio:document.getElementById('op-service-select').value,requestId:cloudCallId});cloudCallId=null;await refreshCloud();if(!db.opHistory.some(h=>h.id===r.history.id))db.opHistory.push(r.history);selectHistory(r.history.id);}catch(e){showCloudError(e);if(!/fetch|espera|conexión|Failed|Network|procesar|completar/i.test(e.message))cloudCallId=null;}finally{nextBusy=false;}};
+function enqueueNote(id,notes){noteChain=noteChain.catch(()=>{}).then(async()=>{await cloudApi('notes',{id,notes});const item=db.opHistory.find(h=>h.id===id);if(item?.notes===notes)noteDirty=false;connectionStatus('Nota guardada en Supabase');});return noteChain;}
+async function flushNotes(){if(cloudNoteTimer||noteDirty){clearTimeout(cloudNoteTimer);cloudNoteTimer=null;const item=db.opHistory.find(h=>h.id===selectedHistoryId);if(item)await enqueueNote(item.id,item.notes);}await noteChain;}
+const originalSelectHistory=selectHistory;
+selectHistory=async function(id){try{await flushNotes();originalSelectHistory(id);}catch(e){showCloudError(e);}};
+addOperator=async function(){try{await cloudApi('account_add',{name:document.getElementById('admin-op-name').value,pin:document.getElementById('admin-op-pin').value,box:document.getElementById('admin-op-box').value});await refreshCloud(true);for(const id of ['admin-op-name','admin-op-pin','admin-op-box'])document.getElementById(id).value='';}catch(e){showCloudError(e);}};
+removeOperator=async function(index){if(!confirm('¿Eliminar '+db.operators[index].box+'?'))return;try{await cloudApi('account_remove',{box:db.operators[index].box});await refreshCloud(true);}catch(e){showCloudError(e);}};
+sendPushMessage=function(){const text=document.getElementById('admin-push-msg').value.trim(),color=document.getElementById('admin-push-color').value;db.pushMessage={text,color};db.msgLog=cloudMemory.msgLog||[];if(text)db.msgLog=[...db.msgLog,{id:Date.now(),text,color,ts:Date.now()}].slice(-200);saveDB('pushMessage','msgLog').then(saved=>{if(saved)document.getElementById('admin-push-status').textContent='Mensaje guardado en Supabase';});};
+clearPushMessage=function(){db.pushMessage={text:'',color:'red'};document.getElementById('admin-push-msg').value='';saveDB('pushMessage');};
+function restorePreferences(p={}){for(const id of p.panelOrder||['panel-history','panel-notes','panel-main']){const panel=document.getElementById(id);if(panel?.parentElement?.id==='op-panel')panel.parentElement.appendChild(panel);}if(p.service)document.getElementById('op-service-select').value=p.service;opMsgShown=p.messageCount||3;renderMsgLog();}
+function savePreferences(){if(!currentOperator)return;const preferences={panelOrder:[...document.getElementById('op-panel').children].map(p=>p.id),service:document.getElementById('op-service-select').value,messageCount:opMsgShown};cloudApi('preferences',preferences).catch(showCloudError);}
+const originalDrop=drop;drop=function(e){originalDrop(e);savePreferences();};
+document.getElementById('op-service-select').addEventListener('change',savePreferences);
+const businessProfiles={clinic:{name:'Clínica Central',icon:'🏥',services:[['Medicina General','🩺'],['Odontología','🦷'],['Laboratorio','🧪'],['Admisiones','📋']]},hospital:{name:'Hospital Central',icon:'🏨',services:[['Consulta Externa','🩺'],['Admisiones','📋'],['Imágenes Diagnósticas','🩻'],['Farmacia','💊']]},bank:{name:'Banco Central',icon:'🏦',services:[['Caja','💵'],['Asesoría Financiera','💼'],['Créditos','🤝'],['Apertura de Cuentas','💳']]},customer:{name:'Centro de Servicio',icon:'🤝',services:[['Atención al Cliente','🙋'],['Pagos','💳'],['Soporte Técnico','🛠️'],['Reclamos','📝']]}};
+async function applyBusiness(){const type=document.getElementById('business-type').value,p=businessProfiles[type];if(!confirm('¿Aplicar '+p.name+'? Se reemplazan servicios y mensaje de bienvenida. Los turnos pendientes e historial se conservan.'))return;db.config={...db.config,businessType:type,businessName:document.getElementById('business-name').value.trim()||p.name};db.services=p.services.map(([name,emoji])=>({name,emoji}));db.rss[0]={...db.rss[0],content:'Bienvenidos a '+db.config.businessName+' • Tenga su documento a mano'};await saveDB('config','services','rss');renderAdmin();applyBrand();}
+const originalRenderAdmin=renderAdmin;renderAdmin=function(){originalRenderAdmin();document.getElementById('business-type').value=db.config.businessType||'clinic';document.getElementById('business-name').value=db.config.businessName||'';};
+document.getElementById('business-type').addEventListener('change',e=>document.getElementById('business-name').value=businessProfiles[e.target.value].name);
+window.addEventListener('beforeunload',e=>{if(cloudPending||cloudNoteTimer||noteDirty){e.preventDefault();e.returnValue='';}});
+
+let lookupTimer;
+document.getElementById('kiosco-cedula').addEventListener('input',e=>{clearTimeout(lookupTimer);const cedula=e.target.value.trim();cloudRequestId=null;if(!cedula)return;lookupTimer=setTimeout(async()=>{try{const r=await cloudApi('lookup',{cedula});if(r.nombre&&document.getElementById('kiosco-cedula').value.trim()===cedula)document.getElementById('kiosco-nombre').value=r.nombre;}catch{}},400);});
+checkCalls=function(){
+ const calls=[...cloudCalls].sort((a,b)=>a.timestamp-b.timestamp);
+ if(!lastProcessedCall&&calls.length){const latest=calls[calls.length-1];calls.forEach(c=>seenCalls.add(c.timestamp));callBacklog.push(latest);lastProcessedCall=latest.timestamp;}
+ else for(const call of calls)if(!seenCalls.has(call.timestamp)&&call.timestamp>lastProcessedCall){seenCalls.add(call.timestamp);callBacklog.push(call);lastProcessedCall=call.timestamp;}
+ if(!isCalling&&callBacklog.length)processNewCall(callBacklog.shift());
+};
+const originalStartPlaylist=startPlaylist;
+startPlaylist=function(){clearTimeout(mediaTimer);currentMediaIndex=db.playlist.length?currentMediaIndex%db.playlist.length:0;if(!db.playlist.length){document.getElementById('media-container').replaceChildren();return;}originalStartPlaylist();};
+refreshCloud();setInterval(()=>refreshCloud(),2000);
+
+</script>
 </body>
 </html>
