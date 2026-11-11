@@ -238,6 +238,61 @@
         .msg-list { max-height: min(150px, 18vh); overflow-y: auto; }
         .msg-item { display: flex; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--border-color); font-size: .9rem; }
         .msg-more { width: 100%; padding: 8px; background: #f7fafc; border: 0; border-top: 1px solid var(--border-color); cursor: pointer; font-weight: 600; color: var(--primary); }
+        /* Apariencia global: superficies claras y texto legible en todas las pantallas. */
+        :root { color-scheme: light; }
+        input, select, textarea { color: var(--text-dark); background-color: var(--card-bg); }
+        input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
+        :where(button, input, select, textarea):focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+        .admin-sidebar, .admin-preview-area, .kiosco-box, .op-panel, #op-login, .help-content, #admin-auth { background: var(--card-bg) !important; color: var(--text-dark); }
+        .admin-sidebar { overflow-y: auto; }
+        .tab-btn:hover, .tab-btn.active, .service-btn.selected, #op-history-list li:hover, #op-history-list li.active { background: var(--theme-soft); }
+        .btn:not(.btn-danger), .kiosco-btn, .btn-next { background: var(--theme-accent); color: var(--primary); }
+        .btn:not(.btn-danger):hover, .kiosco-btn:hover, .btn-next:hover { background: var(--theme-soft); color: var(--primary); }
+        .btn-next { box-shadow: 0 6px 0 var(--border-color); }
+        .btn-danger { background: #FDE8EC; color: #A52D4D; }
+        .btn-danger:hover { background: #FBD6DF; }
+        .launcher-btn, .service-btn { background: var(--card-bg); color: var(--primary); }
+        .launcher-btn:hover { background: var(--theme-accent); color: var(--primary); }
+        .launcher-btn:hover, .service-btn.selected { box-shadow: 0 4px 12px var(--border-color); }
+        #operador-screen, .kiosco-input, .rss-card, .msg-more { background: var(--bg-light); }
+        #op-history-list li.active { border-left-color: var(--primary); }
+        .toggle-switch:checked, #rss-usage-fill { background: var(--primary); }
+        #virtual-keyboard { background: var(--theme-soft); border-color: var(--border-color); }
+        .key { background: var(--card-bg); color: var(--text-dark); border-color: var(--border-color); box-shadow: 0 3px 0 var(--border-color); }
+        .key.special { background: var(--theme-accent); color: var(--primary); }
+        #ticket-display { background: var(--theme-soft); border-color: var(--primary); }
+        #ticket-display h1, #ticket-display h2, #ticket-display p { color: var(--primary) !important; }
+        .corner-grid { background: var(--theme-soft); }
+        .corner-grid button { background: var(--card-bg); color: var(--text-dark); border-color: var(--border-color); }
+        .corner-grid button.on { background: var(--theme-accent); color: var(--primary); border-color: var(--primary); }
+        #pantalla-screen, .pv-stage { background: var(--bg-light); color: var(--text-dark); }
+        .tv-grid, .tv-video-area, .tv-rss-area, .tv-preview-container { background: var(--bg-light); }
+        #media-container, #audio-overlay { background: var(--bg-light) !important; }
+        .tv-clock-area, .tv-green-bar { color: var(--text-dark); }
+        .tv-last-call, .tv-recent-calls { color: var(--text-dark); }
+        .tv-last-call-content .last-name { color: var(--text-dark); }
+        .tv-last-call-content h2 { color: var(--primary); }
+        .tv-recent-list li, .rss-line { border-color: var(--border-color); }
+        #popup-turno, .help-modal, #admin-auth::backdrop { background: var(--theme-overlay); }
+        .popup-card { background: var(--card-bg); border-color: var(--theme-accent); box-shadow: 0 15px 45px var(--border-color); }
+        .popup-card h1, .popup-card h3 { color: var(--primary); text-shadow: none; }
+        .popup-card h2 { color: var(--text-dark); }
+        .popup-card p { background: var(--theme-accent); color: var(--primary); }
+        #tab-appearance .palette-intro { color: var(--text-muted); font-size: .9rem; line-height: 1.6; margin-bottom: 12px; }
+        .palette-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; overflow-y: auto; min-height: 0; padding: 4px; align-content: start; }
+        .palette-option { border: 2px solid var(--border-color); border-radius: 14px; background: var(--card-bg); color: var(--text-dark); cursor: pointer; padding: 12px; text-align: left; }
+        .palette-option:hover { border-color: var(--primary); background: var(--bg-light); }
+        .palette-option[aria-pressed="true"] { border-color: var(--primary); background: var(--theme-soft); }
+        .palette-option:disabled { cursor: wait; }
+        .palette-swatches { display: flex; height: 35px; overflow: hidden; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .palette-swatches span { flex: 1; }
+        .palette-label { display: block; font-weight: 650; font-size: .95rem; }
+        .palette-check { display: block; min-height: 20px; margin-top: 6px; color: var(--primary); font-size: .8rem; font-weight: 600; }
+        .usage-bar { background: var(--theme-soft); }
+        .drag-handle { color: var(--text-muted); }
+        #admin-auth button[type="button"] { background: var(--theme-soft) !important; color: var(--primary); }
+        #palette-current { color: var(--primary); font-weight: 600; margin-bottom: 10px; }
+        #palette-status { min-height: 36px; padding-top: 12px; color: var(--text-muted); font-size: .85rem; }
     </style>
 </head>
 <body>
@@ -269,11 +324,12 @@
             <button class="tab-btn" onclick="openTab('tab-logo')">🏷️ Logo</button>
             <button class="tab-btn" onclick="openTab('tab-services')">🏥 Servicios</button>
             <button class="tab-btn" onclick="openTab('tab-rss')">📰 Tickers RSS</button>
-            <button class="tab-btn" onclick="openTab('tab-business')">⚙️ Negocio y acceso</button><button class="tab-btn" onclick="logoutAdmin()">Salir de administración</button><button class="tab-btn" onclick="toggleHelp()" style="margin-top: auto; color: #e53e3e;">❓ Ayuda</button>
+            <button class="tab-btn" onclick="openTab('tab-appearance')">🎨 Apariencia</button><button class="tab-btn" onclick="openTab('tab-business')">⚙️ Negocio y acceso</button><button class="tab-btn" onclick="logoutAdmin()">Salir de administración</button><button class="tab-btn" onclick="toggleHelp()" style="margin-top: auto; color: #e53e3e;">❓ Ayuda</button>
         </div>
         
         <!-- Contenido Central -->
         <div class="admin-content-area">
+            <div id="tab-appearance" class="tab-content"><h2>Paletas de colores</h2><p class="palette-intro">Diez ambientes luminosos para todo tu negocio. Un clic cambia administración, kioscos, boxes y pantalla de turnos, también en los otros equipos conectados.</p><p class="palette-intro">La paleta también armoniza los colores de las franjas informativas; después puedes personalizarlas en Tickers RSS.</p><p id="palette-current"></p><div id="palette-grid" class="palette-grid" role="group" aria-label="Elegir paleta de colores"></div><p id="palette-status" role="status" aria-live="polite"></p></div>
             <div id="tab-business" class="tab-content"><h2>Negocio y acceso</h2><div class="form-group"><label>Tipo de negocio</label><select id="business-type"><option value="clinic">🏥 Clínica</option><option value="hospital">🏨 Hospital</option><option value="bank">🏦 Banco</option><option value="customer">🤝 Servicio al cliente</option></select></div><div class="form-group"><label>Nombre del negocio</label><input id="business-name" maxlength="120"></div><button class="btn" onclick="applyBusiness()">Aplicar perfil de negocio</button><p style="margin:15px 0">Cambia servicios, iconos y bienvenida. Los turnos e historial se conservan.</p><form onsubmit="changeAdminPassword(event)"><h3>Cambiar contraseña de administrador</h3><div class="form-group"><label>Nueva contraseña (mínimo 10 caracteres)</label><input id="new-admin-password" type="password" autocomplete="new-password" minlength="10" required></div><button class="btn">Cambiar contraseña</button></form></div><!-- Tab Operadores -->
             <div id="tab-ops" class="tab-content active">
                 <h2>Operadores</h2>
@@ -482,7 +538,7 @@
                     <i class="fa-solid fa-grip-vertical drag-handle"></i>
                 </div>
                 <ul id="op-history-list">
-                    <li style="color: #a0aec0; text-align: center; border: none;">No has llamado turnos aún.</li>
+                    <li style="color: var(--text-muted); text-align: center; border: none;">No has llamado turnos aún.</li>
                 </ul>
             </div>
 
@@ -897,7 +953,7 @@
             applyVideoFit(v);
             if (v.dataset.k !== key) {
                 v.dataset.k = key;
-                st.querySelector('#pv-media').innerHTML = !m ? '<span style="color:#888;font-size:40px">Sin multimedia</span>' : mediaHTML(m.url, true);
+                st.querySelector('#pv-media').innerHTML = !m ? '<span style="color:var(--text-muted);font-size:40px">Sin multimedia</span>' : mediaHTML(m.url, true);
             }
             applyLogo(st.querySelector('#pv-logo'));
             const r = st.querySelector('#pv-rss'); r.style.display = feeds.length ? 'flex' : 'none';
@@ -1124,8 +1180,8 @@
             if (!all.length) { el.style.display = 'none'; return; }
             el.style.display = 'block';
             const dot = { red: '🔴', yellow: '🟡', green: '🟢' };
-            el.innerHTML = `<div style="padding:6px 12px;background:#f7fafc;font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase">Mensajes de hoy (${all.length})</div>
-                <div class="msg-list">${all.slice(0, opMsgShown).map(m => `<div class="msg-item"><span>${dot[m.color] || '🟢'}</span><span style="flex:1">${esc(m.text)}</span><span style="color:#a0aec0;font-size:.8rem">${new Date(m.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>`).join('')}</div>
+            el.innerHTML = `<div style="padding:6px 12px;background:var(--theme-soft);font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase">Mensajes de hoy (${all.length})</div>
+                <div class="msg-list">${all.slice(0, opMsgShown).map(m => `<div class="msg-item"><span>${dot[m.color] || '🟢'}</span><span style="flex:1">${esc(m.text)}</span><span style="color:var(--text-muted);font-size:.8rem">${new Date(m.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>`).join('')}</div>
                 ${all.length > opMsgShown ? `<button class="msg-more" onclick="opMsgShown += 3; renderMsgLog(); savePreferences()">Ver anteriores (${all.length - opMsgShown})</button>` : ''}`;
         }
 
@@ -1177,7 +1233,7 @@
             const myHistory = db.opHistory.filter(h => h.pin === currentOperator.pin);
             
             if(myHistory.length === 0) {
-                list.innerHTML = `<li style="color: #a0aec0; text-align: center; border: none;">No has llamado turnos aún.</li>`;
+                list.innerHTML = `<li style="color: var(--text-muted); text-align: center; border: none;">No has llamado turnos aún.</li>`;
                 return;
             }
 
@@ -1185,7 +1241,7 @@
                 <li onclick="selectHistory(${h.id})" class="${selectedHistoryId === h.id ? 'active' : ''}">
                     <div class="hist-header">
                         <span>${esc(h.turno)}</span>
-                        <span style="color: #a0aec0; font-size: 0.8rem;">${h.time}</span>
+                        <span style="color: var(--text-muted); font-size: 0.8rem;">${h.time}</span>
                     </div>
                     <div class="hist-name">${esc(h.name)}</div>
                 </li>
@@ -1434,6 +1490,45 @@
     </script>
 <script>
 // Adaptador Supabase: conserva las pantallas y sus controles originales.
+// Paletas luminosas compartidas por todas las pantallas de la sede.
+const COLOR_PALETTES = [
+ {id:'cielo',name:'Cielo Claro',primary:'#216285',accent:'#C2E8F7',soft:'#E5F4FB',bg:'#F4FBFE',border:'#BEDCE9',text:'#294553',muted:'#526C7A'},
+ {id:'brisa',name:'Brisa Marina',primary:'#1C696F',accent:'#BCEAE9',soft:'#E1F6F5',bg:'#F2FCFB',border:'#B8DEDC',text:'#294B4F',muted:'#506F72'},
+ {id:'menta',name:'Menta Fresca',primary:'#256B4B',accent:'#C5EDD9',soft:'#E6F8EE',bg:'#F4FCF7',border:'#BFDEC9',text:'#304C3E',muted:'#557260'},
+ {id:'jardin',name:'Jardín Suave',primary:'#416931',accent:'#D8ECC7',soft:'#EEF7E7',bg:'#F8FCF4',border:'#CCDEBF',text:'#3E4D36',muted:'#617357'},
+ {id:'lavanda',name:'Lavanda Serena',primary:'#614C8D',accent:'#DFD7F5',soft:'#F0EBFB',bg:'#FAF8FE',border:'#D8CEEA',text:'#48415B',muted:'#6C617E'},
+ {id:'lila',name:'Lila Alegre',primary:'#7C4B79',accent:'#EED5ED',soft:'#F9EAF8',bg:'#FDF7FD',border:'#E3CBE1',text:'#544052',muted:'#795F77'},
+ {id:'rosa',name:'Rosa Nube',primary:'#933F67',accent:'#F6D1E2',soft:'#FCE9F1',bg:'#FFF7FB',border:'#EBC9D8',text:'#593E4B',muted:'#805D6D'},
+ {id:'coral',name:'Coral Vital',primary:'#964658',accent:'#F8D6DE',soft:'#FDEDF0',bg:'#FFF8FA',border:'#ECCDD5',text:'#593F48',muted:'#805E69'},
+ {id:'aqua',name:'Aqua Cristal',primary:'#20687A',accent:'#BAEAF2',soft:'#DFF6FA',bg:'#F1FCFE',border:'#B8DDE5',text:'#2A4852',muted:'#50707B'},
+ {id:'perla',name:'Perla Azul',primary:'#4B6296',accent:'#D5E1FA',soft:'#ECF1FD',bg:'#F7F9FF',border:'#CDD8EE',text:'#3D4862',muted:'#606E8A'}
+];
+function selectedPalette() { return COLOR_PALETTES.find(p => p.id === db.config.themePalette) || COLOR_PALETTES[0]; }
+function applyPaletteTokens() {
+ const p=selectedPalette(), root=document.documentElement;
+ const tokens={'primary':p.primary,'bg-light':p.bg,'card-bg':'#FFFFFF','text-dark':p.text,'text-muted':p.muted,'border-color':p.border,'theme-soft':p.soft,'theme-accent':p.accent,'theme-overlay':p.bg+'DB','tv-blue':p.soft,'tv-green':p.accent,'tv-bg':p.accent};
+ for(const [key,value] of Object.entries(tokens))root.style.setProperty('--'+key,value);
+ root.dataset.palette=p.id;
+ document.querySelectorAll('.palette-option').forEach(button=>{const active=button.dataset.palette===p.id;button.setAttribute('aria-pressed',String(active));button.querySelector('.palette-check').textContent=active?'✓ Activa':'';});
+ const current=document.getElementById('palette-current');if(current)current.textContent='Paleta actual: '+p.name;
+}
+function renderPalettePicker() {
+ const grid=document.getElementById('palette-grid');
+ grid.innerHTML=COLOR_PALETTES.map(p=>`<button type="button" class="palette-option" data-palette="${p.id}" aria-pressed="false" onclick="choosePalette('${p.id}')"><span class="palette-swatches" aria-hidden="true">${[p.bg,p.soft,p.accent,p.primary].map(color=>`<span style="background:${color}"></span>`).join('')}</span><span class="palette-label">${p.name}</span><span class="palette-check"></span></button>`).join('');
+ applyPaletteTokens();
+}
+async function choosePalette(id) {
+ const p=COLOR_PALETTES.find(p=>p.id===id);if(!p)return;
+ const status=document.getElementById('palette-status'),buttons=document.querySelectorAll('.palette-option');
+ buttons.forEach(button=>button.disabled=true);status.textContent='Guardando '+p.name+'…';
+ if(cloudPending)await cloudSaving;
+ db.config={...db.config,themePalette:p.id,primaryColor:p.primary};
+ db.rss=db.rss.map((feed,i)=>({...feed,bgColor:[p.soft,p.accent,p.bg][i%3],textColor:p.text}));
+ applyPaletteTokens();updatePreview();
+ try{const saved=await saveDB('config','rss');status.textContent=saved?'Paleta '+p.name+' guardada para todas las pantallas.':'No se pudo guardar la paleta. Intenta nuevamente.';}
+ finally{buttons.forEach(button=>button.disabled=false);applyPaletteTokens();updatePreview();if(document.getElementById('tab-rss').classList.contains('active'))renderRSSInputs();}
+}
+
 const API_URL='https://phqbcfjbsdibushvolqh.supabase.co/functions/v1/digiturno';
 let cloudToken=sessionStorage.getItem('dt-session')||'', cloudUser=null, cloudReady=false, cloudPolling=false;
 let cloudVersions={}, cloudBaseline={}, cloudPending=0, cloudSaving=Promise.resolve(), cloudNoteTimer, cloudRequestId=null, cloudCallId=null;
@@ -1451,7 +1546,7 @@ async function cloudApi(action,payload={},token=cloudToken){
 }
 function newRequestId(){return Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');}
 function showCloudError(e){alert(e.message||'No se pudo guardar. Verifique la conexión.');}
-function applyBrand(){document.documentElement.style.setProperty('--primary',db.config.primaryColor||'#0056b3');const heading=document.querySelector('#kiosco-screen h1');heading.textContent='Bienvenido a '+(db.config.businessName||'nuestro centro');document.title=(db.config.businessName||'Digiturno')+' · Turnos';}
+function applyBrand(){applyPaletteTokens();const heading=document.querySelector('#kiosco-screen h1');heading.textContent='Bienvenido a '+(db.config.businessName||'nuestro centro');document.title=(db.config.businessName||'Digiturno')+' · Turnos';}
 async function refreshCloud(force=false){
  if(cloudPolling||cloudPending)return;
  cloudPolling=true;
@@ -1463,6 +1558,7 @@ async function refreshCloud(force=false){
   pendingServiceNames=snap.pendingServices||[];cloudCalls=snap.calls||[];cloudVersions=snap.versions||{};
   for(const key of ['playlist','rss','services','config','pushMessage','msgLog'])cloudBaseline[key]=JSON.stringify(db[key]);
   cloudReady=true;applyBrand();
+  if(document.getElementById('admin-screen').classList.contains('active')&&(previous.config!==JSON.stringify(db.config)||previous.rss!==JSON.stringify(db.rss)))updatePreview();
   const servicesChanged=previous.services!==JSON.stringify(db.services);
   if(servicesChanged&&document.getElementById('kiosco-screen').classList.contains('active')){const selected=selectedService;setupKiosco();const i=db.services.findIndex(s=>s.name===selected);if(i>=0)selectService(i,document.querySelectorAll('.service-btn')[i]);}
   if(servicesChanged||pendingServiceNames.length){const select=document.getElementById('op-service-select'),value=select.value;fillServiceSelect(select,value);}
@@ -1538,6 +1634,7 @@ checkCalls=function(){
 };
 const originalStartPlaylist=startPlaylist;
 startPlaylist=function(){clearTimeout(mediaTimer);currentMediaIndex=db.playlist.length?currentMediaIndex%db.playlist.length:0;if(!db.playlist.length){document.getElementById('media-container').replaceChildren();return;}originalStartPlaylist();};
+renderPalettePicker();
 refreshCloud();setInterval(()=>refreshCloud(),2000);
 
 </script>
