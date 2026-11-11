@@ -246,7 +246,7 @@
         .admin-sidebar, .admin-preview-area, .kiosco-box, .op-panel, #op-login, .help-content, #admin-auth { background: var(--card-bg) !important; color: var(--text-dark); }
         .admin-sidebar { overflow-y: auto; }
         .tab-btn:hover, .tab-btn.active, .service-btn.selected, #op-history-list li:hover, #op-history-list li.active { background: var(--theme-soft); }
-        .btn:not(.btn-danger), .kiosco-btn, .btn-next { background: var(--theme-accent); color: var(--primary); }
+        .btn:not(.btn-danger), .kiosco-btn, .btn-next { background: var(--theme-action-bg); color: var(--theme-action-text); }
         .btn:not(.btn-danger):hover, .kiosco-btn:hover, .btn-next:hover { background: var(--theme-soft); color: var(--primary); }
         .btn-next { box-shadow: 0 6px 0 var(--border-color); }
         .btn-danger { background: #FDE8EC; color: #A52D4D; }
@@ -257,8 +257,8 @@
         #operador-screen, .kiosco-input, .rss-card, .msg-more { background: var(--bg-light); }
         #op-history-list li.active { border-left-color: var(--primary); }
         .toggle-switch:checked, #rss-usage-fill { background: var(--primary); }
-        #virtual-keyboard { background: var(--theme-soft); border-color: var(--border-color); }
-        .key { background: var(--card-bg); color: var(--text-dark); border-color: var(--border-color); box-shadow: 0 3px 0 var(--border-color); }
+        #virtual-keyboard { background: var(--keyboard-bg); border-color: var(--border-color); }
+        .key { background: var(--key-bg); color: var(--key-text); border-color: var(--border-color); box-shadow: 0 3px 0 var(--border-color); }
         .key.special { background: var(--theme-accent); color: var(--primary); }
         #ticket-display { background: var(--theme-soft); border-color: var(--primary); }
         #ticket-display h1, #ticket-display h2, #ticket-display p { color: var(--primary) !important; }
@@ -268,16 +268,17 @@
         #pantalla-screen, .pv-stage { background: var(--bg-light); color: var(--text-dark); }
         .tv-grid, .tv-video-area, .tv-rss-area, .tv-preview-container { background: var(--bg-light); }
         #media-container, #audio-overlay { background: var(--bg-light) !important; }
-        .tv-clock-area, .tv-green-bar { color: var(--text-dark); }
-        .tv-last-call, .tv-recent-calls { color: var(--text-dark); }
-        .tv-last-call-content .last-name { color: var(--text-dark); }
-        .tv-last-call-content h2 { color: var(--primary); }
+        .tv-clock-area, .tv-green-bar { color: var(--tv-text); }
+        .tv-last-call, .tv-recent-calls { color: var(--tv-text); }
+        .tv-last-call-content .last-name { color: var(--tv-text); }
+        .tv-last-call-content h2 { color: var(--tv-number); }
         .tv-recent-list li, .rss-line { border-color: var(--border-color); }
         #popup-turno, .help-modal, #admin-auth::backdrop { background: var(--theme-overlay); }
-        .popup-card { background: var(--card-bg); border-color: var(--theme-accent); box-shadow: 0 15px 45px var(--border-color); }
-        .popup-card h1, .popup-card h3 { color: var(--primary); text-shadow: none; }
-        .popup-card h2 { color: var(--text-dark); }
-        .popup-card p { background: var(--theme-accent); color: var(--primary); }
+        .popup-card { background: var(--popup-bg); border-color: var(--theme-accent); box-shadow: 0 15px 45px var(--border-color); }
+        .popup-card h1 { color: var(--popup-number); text-shadow: none; }
+        .popup-card h3 { color: var(--popup-text); }
+        .popup-card h2 { color: var(--popup-text); }
+        .popup-card p { background: var(--theme-accent); color: var(--popup-text); }
         #tab-appearance .palette-intro { color: var(--text-muted); font-size: .9rem; line-height: 1.6; margin-bottom: 12px; }
         .palette-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; overflow-y: auto; min-height: 0; padding: 4px; align-content: start; }
         .palette-option { border: 2px solid var(--border-color); border-radius: 14px; background: var(--card-bg); color: var(--text-dark); cursor: pointer; padding: 12px; text-align: left; }
@@ -293,12 +294,37 @@
         #admin-auth button[type="button"] { background: var(--theme-soft) !important; color: var(--primary); }
         #palette-current { color: var(--primary); font-weight: 600; margin-bottom: 10px; }
         #palette-status { min-height: 36px; padding-top: 12px; color: var(--text-muted); font-size: .85rem; }
+        #tab-appearance.active { overflow-y: auto; display: block; }
+        #tab-appearance .palette-grid { overflow: visible; }
+        .appearance-shape { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; margin: 10px 0 18px; }
+        .appearance-shape select { padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; }
+        #corner-status { grid-column: 1 / -1; font-size: .8rem; color: var(--text-muted); }
+        #custom-colors-panel { margin-top: 12px; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--card-bg); }
+        #custom-colors-panel summary { cursor: pointer; font-weight: 650; color: var(--primary); margin-bottom: 12px; }
+        #custom-colors-fields { display: grid; grid-template-columns: repeat(auto-fit,minmax(245px,1fr)); gap: 12px; }
+        #custom-colors-fields fieldset { border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; min-width: 0; }
+        #custom-colors-fields legend { color: var(--primary); padding: 0 5px; font-weight: 600; }
+        .custom-color-row { display: grid; grid-template-columns: 1fr 44px 75px; gap: 8px; align-items: center; margin: 8px 0; font-size: .85rem; }
+        .custom-color-row input[type=color] { width: 44px; height: 34px; border: 1px solid var(--border-color); padding: 2px; cursor: pointer; }
+        .custom-color-row output { font-family: monospace; font-size: .8rem; }
+        #custom-contrast { margin: 14px 0; font-size: .85rem; color: var(--text-muted); line-height: 1.5; }
+        .custom-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .custom-actions .btn { flex: 1; min-width: 130px; }
+        .operator-actions { display: flex; align-items: center; gap: 8px; }
+        .operator-actions .btn { width: auto; margin: 0; padding: 6px 12px; font-size: .85rem; }
+        #edit-operator-dialog { margin: auto; padding: 28px; width: min(92vw,480px); max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 16px; background: var(--card-bg); color: var(--text-dark); }
+        #edit-operator-dialog::backdrop { background: var(--theme-overlay); }
+        #edit-op-error { color: #A52D4D; margin-bottom: 10px; }
+        #edit-operator-dialog small { margin-top: 8px; color: var(--text-muted); line-height: 1.5; }
+        .tv-clock-area, .tv-last-call, .tv-recent-calls { border-radius: 12px; }
+        :root[data-corners="square"] :is(button, input:not([type=checkbox]), select, textarea, fieldset, .kiosco-box, .op-panel, .popup-card, .popup-card p, .key, .help-content, .rss-card, .tv-preview-container, .corner-grid, .palette-swatches, .tv-clock-area, .tv-last-call, .tv-recent-calls, #ticket-display, #op-login, #admin-auth, #edit-operator-dialog, #op-push-zone, #op-msg-log, #custom-colors-panel) { border-radius: 0 !important; }
     </style>
 </head>
 <body>
 <div id="cloud-status" role="status" hidden style="position:fixed;bottom:5px;right:8px;z-index:20000;background:#234e52;color:white;padding:5px 10px;border-radius:6px;font:12px sans-serif;pointer-events:none">Conectando con Supabase…</div>
 <dialog id="admin-auth" style="margin:auto;border:0;border-radius:15px;padding:30px;max-width:420px;width:90%"><form onsubmit="loginAdmin(event)"><h2>Acceso Administrador</h2><label for="admin-password">Contraseña</label><input id="admin-password" type="password" autocomplete="current-password" required style="width:100%;padding:12px;margin:15px 0"><p id="admin-auth-error" style="color:#c53030"></p><button class="btn" type="submit">Ingresar</button><button class="btn" type="button" style="margin-top:8px;background:#718096" onclick="document.getElementById('admin-auth').close()">Cancelar</button></form></dialog>
 
+    <dialog id="edit-operator-dialog"><form onsubmit="submitOperatorEdit(event)"><h2>Editar operador y box</h2><input id="edit-op-original" type="hidden"><div class="form-group"><label for="edit-op-name">Nombre del operador</label><input id="edit-op-name" maxlength="120" required></div><div class="form-group"><label for="edit-op-box">Nombre del box</label><input id="edit-op-box" maxlength="120" required></div><div class="form-group"><label for="edit-op-pin">Nuevo PIN (4 dígitos)</label><input id="edit-op-pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="new-password"><small>Déjalo vacío para conservar el PIN actual. Cambiarlo cierra la sesión del box.</small></div><p id="edit-op-error" role="alert"></p><div class="custom-actions"><button id="edit-op-submit" class="btn" type="submit">Guardar cambios</button><button class="btn" type="button" onclick="document.getElementById('edit-operator-dialog').close()">Cancelar</button></div></form></dialog>
     <div id="secret-trigger" onmousedown="startHold()" onmouseup="cancelHold()" onmouseleave="cancelHold()" ontouchstart="startHold()" ontouchend="cancelHold()"></div>
 
     <!-- 0. LAUNCHER -->
@@ -329,7 +355,7 @@
         
         <!-- Contenido Central -->
         <div class="admin-content-area">
-            <div id="tab-appearance" class="tab-content"><h2>Paletas de colores</h2><p class="palette-intro">Diez ambientes luminosos para todo tu negocio. Un clic cambia administración, kioscos, boxes y pantalla de turnos, también en los otros equipos conectados.</p><p class="palette-intro">La paleta también armoniza los colores de las franjas informativas; después puedes personalizarlas en Tickers RSS.</p><p id="palette-current"></p><div id="palette-grid" class="palette-grid" role="group" aria-label="Elegir paleta de colores"></div><p id="palette-status" role="status" aria-live="polite"></p></div>
+            <div id="tab-appearance" class="tab-content"><h2>Paletas de colores</h2><p class="palette-intro">Paletas luminosas y colores a tu medida para todo tu negocio. Un clic cambia administración, kioscos, boxes y pantalla de turnos, también en los otros equipos conectados.</p><p class="palette-intro">La paleta también armoniza los colores de las franjas informativas; después puedes personalizarlas en Tickers RSS.</p><div class="appearance-shape"><label for="corner-style">Forma de las esquinas</label><select id="corner-style" onchange="saveCornerStyle()"><option value="rounded">Esquinas redondeadas</option><option value="square">Esquinas rectas</option></select><p id="corner-status" role="status"></p></div><p id="palette-current"></p><div id="palette-grid" class="palette-grid" role="group" aria-label="Elegir paleta de colores"></div><p id="palette-status" role="status" aria-live="polite"></p><details id="custom-colors-panel"><summary>Definido por el usuario · editar colores</summary><p class="palette-intro">Prueba todos los colores con vista previa local. Usa Guardar para aplicarlos a los demás equipos.</p><button type="button" class="btn" onclick="openCustomPalette(true)">Partir de la paleta actual</button><div id="custom-colors-fields"></div><p id="custom-contrast" role="status"></p><div class="custom-actions"><button id="save-custom-palette" type="button" class="btn" onclick="saveCustomPalette()">Guardar colores personalizados</button><button type="button" class="btn" onclick="cancelCustomPalette()">Cancelar vista previa</button></div></details></div>
             <div id="tab-business" class="tab-content"><h2>Negocio y acceso</h2><div class="form-group"><label>Tipo de negocio</label><select id="business-type"><option value="clinic">🏥 Clínica</option><option value="hospital">🏨 Hospital</option><option value="bank">🏦 Banco</option><option value="customer">🤝 Servicio al cliente</option></select></div><div class="form-group"><label>Nombre del negocio</label><input id="business-name" maxlength="120"></div><button class="btn" onclick="applyBusiness()">Aplicar perfil de negocio</button><p style="margin:15px 0">Cambia servicios, iconos y bienvenida. Los turnos e historial se conservan.</p><form onsubmit="changeAdminPassword(event)"><h3>Cambiar contraseña de administrador</h3><div class="form-group"><label>Nueva contraseña (mínimo 10 caracteres)</label><input id="new-admin-password" type="password" autocomplete="new-password" minlength="10" required></div><button class="btn">Cambiar contraseña</button></form></div><!-- Tab Operadores -->
             <div id="tab-ops" class="tab-content active">
                 <h2>Operadores</h2>
@@ -701,7 +727,7 @@
             opList.innerHTML = db.operators.map((op, index) => `
                 <div class="list-item">
                     <span><strong>${esc(op.name)}</strong> (${esc(op.box)}) - PIN: ${esc(op.pin)}</span>
-                    <button class="btn-danger" onclick="removeOperator(${index})">X</button>
+                    <div class="operator-actions"><button type="button" class="btn" data-box="${esc(op.box)}" onclick="editOperator(this.dataset.box)">Editar</button><button class="btn-danger" onclick="removeOperator(${index})" aria-label="Eliminar operador">X</button></div>
                 </div>
             `).join('');
 
@@ -957,7 +983,8 @@
             }
             applyLogo(st.querySelector('#pv-logo'));
             const r = st.querySelector('#pv-rss'); r.style.display = feeds.length ? 'flex' : 'none';
-            r.innerHTML = feeds.map(f => {
+            r.innerHTML = feeds.map(feed => {
+                const f = customPaletteDraft ? {...feed, bgColor:customPaletteDraft.tickerBg, textColor:customPaletteDraft.tickerText} : feed;
                 const h = f.size * UNIT * PX;
                 const c = f.type === 'text' ? f.content : ((getSafeItem('feedCache:' + f.content, null) || ['Titulares de noticias del feed…']).slice(0, 4).join('  •  '));
                 return `<div class="rss-line" style="background:${f.bgColor};color:${f.textColor};height:${h}px"><span style="font-size:${h*0.4}px;font-weight:800;text-transform:uppercase;padding:0 20px">${esc(c)}</span></div>`;
@@ -1501,35 +1528,94 @@ const COLOR_PALETTES = [
  {id:'rosa',name:'Rosa Nube',primary:'#933F67',accent:'#F6D1E2',soft:'#FCE9F1',bg:'#FFF7FB',border:'#EBC9D8',text:'#593E4B',muted:'#805D6D'},
  {id:'coral',name:'Coral Vital',primary:'#964658',accent:'#F8D6DE',soft:'#FDEDF0',bg:'#FFF8FA',border:'#ECCDD5',text:'#593F48',muted:'#805E69'},
  {id:'aqua',name:'Aqua Cristal',primary:'#20687A',accent:'#BAEAF2',soft:'#DFF6FA',bg:'#F1FCFE',border:'#B8DDE5',text:'#2A4852',muted:'#50707B'},
- {id:'perla',name:'Perla Azul',primary:'#4B6296',accent:'#D5E1FA',soft:'#ECF1FD',bg:'#F7F9FF',border:'#CDD8EE',text:'#3D4862',muted:'#606E8A'}
+ {id:'perla',name:'Perla Azul',primary:'#4B6296',accent:'#D5E1FA',soft:'#ECF1FD',bg:'#F7F9FF',border:'#CDD8EE',text:'#3D4862',muted:'#606E8A'},
+ {id:'mandarina',name:'Mandarina Clara',primary:'#A33C35',accent:'#FFD8BD',soft:'#FFF0E5',bg:'#FFFAF6',border:'#F3D6C5',text:'#51464A',muted:'#78636B'},
+ {id:'papaya',name:'Papaya Fresca',primary:'#A9374B',accent:'#FFD0C4',soft:'#FFEDE8',bg:'#FFF9F7',border:'#F0CFC8',text:'#54434C',muted:'#7A606C'},
+ {id:'naranja',name:'Naranja Viva',primary:'#A83D32',accent:'#FFDECA',soft:'#FFF1E9',bg:'#FFFBF8',border:'#F2D7C9',text:'#51444B',muted:'#76646D'},
+ {id:'azul-clasico',name:'Azul Clásico',primary:'#0056B3',accent:'#BDDBFF',soft:'#E5F0FF',bg:'#F5F9FF',border:'#C3D9F3',text:'#28445F',muted:'#526D87'},
+ {id:'cobalto',name:'Cobalto Luminoso',primary:'#2355A3',accent:'#CBDFFF',soft:'#EAF2FF',bg:'#F7FAFF',border:'#C9D9F1',text:'#344760',muted:'#5A6C86'},
+ {id:'pacifico',name:'Pacífico Suave',primary:'#23658D',accent:'#BDE7FF',soft:'#E5F6FF',bg:'#F4FBFF',border:'#C2DFEF',text:'#2B4757',muted:'#536F7F'},
+ {id:'fresa',name:'Fresa Luminosa',primary:'#A52D4B',accent:'#FFD0DD',soft:'#FFEBF0',bg:'#FFF7FA',border:'#EFCCD7',text:'#583E4C',muted:'#7F5E6C'},
+ {id:'cereza',name:'Cereza Suave',primary:'#A72C40',accent:'#FFD4DC',soft:'#FFECF0',bg:'#FFF8FA',border:'#F0CDD5',text:'#573F48',muted:'#7D6068'},
+ {id:'rojo-claro',name:'Rojo Amanecer',primary:'#AB3938',accent:'#FFD7D2',soft:'#FFEFEA',bg:'#FFF9F8',border:'#EED0CE',text:'#54434B',muted:'#7C626C'}
 ];
-function selectedPalette() { return COLOR_PALETTES.find(p => p.id === db.config.themePalette) || COLOR_PALETTES[0]; }
+const CUSTOM_COLOR_GROUPS = [
+ ['General',[['bg','Fondo general'],['card','Tarjetas y formularios'],['primary','Títulos y selección'],['text','Texto principal'],['muted','Texto secundario'],['border','Bordes']]],
+ ['Botones y acentos',[['soft','Fondo suave'],['accent','Acento'],['actionBg','Fondo de botones'],['actionText','Texto de botones']]],
+ ['Teclado del kiosco',[['keyboardBg','Fondo del teclado'],['keyBg','Fondo de teclas'],['keyText','Texto de teclas']]],
+ ['Pantalla y llamado',[['tvPanel','Fondo de turnos'],['tvHeader','Cabeceras y reloj'],['tvText','Texto en TV'],['tvNumber','Número del turno'],['popupBg','Fondo del llamado'],['popupText','Nombre y box del llamado'],['popupNumber','Número del llamado']]],
+ ['Franjas informativas',[['tickerBg','Fondo de franjas'],['tickerText','Texto de franjas']]]
+];
+let customPaletteDraft=null;
+function expandedPalette(p) { return {...p,card:p.card||'#FFFFFF',actionBg:p.actionBg||p.accent,actionText:p.actionText||p.primary,keyboardBg:p.keyboardBg||p.soft,keyBg:p.keyBg||p.card||'#FFFFFF',keyText:p.keyText||p.text,tvPanel:p.tvPanel||p.soft,tvHeader:p.tvHeader||p.accent,tvText:p.tvText||p.text,tvNumber:p.tvNumber||p.primary,popupBg:p.popupBg||p.card||'#FFFFFF',popupText:p.popupText||p.text,popupNumber:p.popupNumber||p.primary,tickerBg:p.tickerBg||p.soft,tickerText:p.tickerText||p.text}; }
+function customPaletteFrom(source={}) {
+ const fallback=expandedPalette(COLOR_PALETTES[0]),p={id:'custom',name:'Definido por el usuario'};
+ for(const [key] of CUSTOM_COLOR_GROUPS.flatMap(group=>group[1]))p[key]=/^#[0-9a-f]{6}$/i.test(source[key]||'')?source[key]:fallback[key];
+ return p;
+}
+function selectedPalette() {
+ if(customPaletteDraft)return customPaletteDraft;
+ if(db.config.themePalette==='custom')return customPaletteFrom(db.config.customColors);
+ return expandedPalette(COLOR_PALETTES.find(p=>p.id===db.config.themePalette)||COLOR_PALETTES[0]);
+}
 function applyPaletteTokens() {
- const p=selectedPalette(), root=document.documentElement;
- const tokens={'primary':p.primary,'bg-light':p.bg,'card-bg':'#FFFFFF','text-dark':p.text,'text-muted':p.muted,'border-color':p.border,'theme-soft':p.soft,'theme-accent':p.accent,'theme-overlay':p.bg+'DB','tv-blue':p.soft,'tv-green':p.accent,'tv-bg':p.accent};
+ const p=selectedPalette(),root=document.documentElement;
+ const tokens={'primary':p.primary,'bg-light':p.bg,'card-bg':p.card,'text-dark':p.text,'text-muted':p.muted,'border-color':p.border,'theme-soft':p.soft,'theme-accent':p.accent,'theme-overlay':p.bg+'DB','theme-action-bg':p.actionBg,'theme-action-text':p.actionText,'keyboard-bg':p.keyboardBg,'key-bg':p.keyBg,'key-text':p.keyText,'tv-blue':p.tvPanel,'tv-green':p.tvHeader,'tv-bg':p.tvHeader,'tv-text':p.tvText,'tv-number':p.tvNumber,'popup-bg':p.popupBg,'popup-text':p.popupText,'popup-number':p.popupNumber};
  for(const [key,value] of Object.entries(tokens))root.style.setProperty('--'+key,value);
- root.dataset.palette=p.id;
+ root.dataset.palette=p.id;root.dataset.corners=db.config.cornerStyle==='square'?'square':'rounded';
+ const customSwatch=customPaletteDraft||customPaletteFrom(db.config.customColors);
+ document.querySelectorAll('.palette-option[data-palette="custom"] .palette-swatches span').forEach((span,i)=>span.style.background=[customSwatch.bg,customSwatch.soft,customSwatch.accent,customSwatch.primary][i]);
  document.querySelectorAll('.palette-option').forEach(button=>{const active=button.dataset.palette===p.id;button.setAttribute('aria-pressed',String(active));button.querySelector('.palette-check').textContent=active?'✓ Activa':'';});
- const current=document.getElementById('palette-current');if(current)current.textContent='Paleta actual: '+p.name;
+ const current=document.getElementById('palette-current');if(current)current.textContent=(customPaletteDraft?'Vista previa sin guardar: ':'Paleta actual: ')+p.name;
+ const corner=document.getElementById('corner-style');if(corner&&document.activeElement!==corner)corner.value=root.dataset.corners;
 }
 function renderPalettePicker() {
  const grid=document.getElementById('palette-grid');
- grid.innerHTML=COLOR_PALETTES.map(p=>`<button type="button" class="palette-option" data-palette="${p.id}" aria-pressed="false" onclick="choosePalette('${p.id}')"><span class="palette-swatches" aria-hidden="true">${[p.bg,p.soft,p.accent,p.primary].map(color=>`<span style="background:${color}"></span>`).join('')}</span><span class="palette-label">${p.name}</span><span class="palette-check"></span></button>`).join('');
+ grid.innerHTML=[...COLOR_PALETTES,{...customPaletteFrom(db.config.customColors),name:'Definido por el usuario'}].map(p=>`<button type="button" class="palette-option" data-palette="${p.id}" aria-pressed="false" onclick="${p.id==='custom'?'openCustomPalette()':`choosePalette('${p.id}')`}"><span class="palette-swatches" aria-hidden="true">${[p.bg,p.soft,p.accent,p.primary].map(color=>`<span style="background:${color}"></span>`).join('')}</span><span class="palette-label">${p.name}</span><span class="palette-check"></span></button>`).join('');
+ document.getElementById('custom-colors-fields').innerHTML=CUSTOM_COLOR_GROUPS.map(([name,fields])=>`<fieldset><legend>${name}</legend>${fields.map(([key,label])=>`<div class="custom-color-row"><label for="custom-${key}">${label}</label><input type="color" id="custom-${key}" oninput="previewCustomPalette()"><output for="custom-${key}" id="custom-value-${key}"></output></div>`).join('')}</fieldset>`).join('');
  applyPaletteTokens();
 }
-async function choosePalette(id) {
- const p=COLOR_PALETTES.find(p=>p.id===id);if(!p)return;
- const status=document.getElementById('palette-status'),buttons=document.querySelectorAll('.palette-option');
- buttons.forEach(button=>button.disabled=true);status.textContent='Guardando '+p.name+'…';
+function fillCustomColorInputs(p) {
+ for(const [key] of CUSTOM_COLOR_GROUPS.flatMap(group=>group[1])){document.getElementById('custom-'+key).value=p[key];document.getElementById('custom-value-'+key).textContent=p[key].toUpperCase();}
+}
+function openCustomPalette(copyCurrent=false) {
+ customPaletteDraft=customPaletteFrom(copyCurrent?selectedPalette():(db.config.customColors||selectedPalette()));
+ fillCustomColorInputs(customPaletteDraft);document.getElementById('custom-colors-panel').open=true;
+ applyPaletteTokens();updatePreview();updateContrastNotice();document.getElementById('custom-colors-panel').scrollIntoView({block:'start',behavior:'smooth'});
+}
+function previewCustomPalette() {
+ customPaletteDraft=customPaletteFrom(Object.fromEntries(CUSTOM_COLOR_GROUPS.flatMap(group=>group[1]).map(([key])=>[key,document.getElementById('custom-'+key).value])));
+ for(const [key] of CUSTOM_COLOR_GROUPS.flatMap(group=>group[1]))document.getElementById('custom-value-'+key).textContent=customPaletteDraft[key].toUpperCase();
+ applyPaletteTokens();updatePreview();updateContrastNotice();
+}
+function updateContrastNotice() {
+ const p=customPaletteDraft||selectedPalette();
+ const luminance=color=>color.slice(1).match(/../g).map(c=>parseInt(c,16)/255).map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4).reduce((a,c,i)=>a+c*[.2126,.7152,.0722][i],0);
+ const pairs=[['texto',p.text,p.card],['botones',p.actionText,p.actionBg],['teclado',p.keyText,p.keyBg],['TV',p.tvText,p.tvPanel],['llamado',p.popupText,p.popupBg],['franjas',p.tickerText,p.tickerBg]];
+ const weak=pairs.filter(([,a,b])=>(Math.max(luminance(a),luminance(b))+.05)/(Math.min(luminance(a),luminance(b))+.05)<4.5).map(([label])=>label);
+ document.getElementById('custom-contrast').textContent=weak.length?'Contraste bajo en '+weak.join(', ')+'. Prueba un texto más contrastado para facilitar la lectura.':'Buen contraste en las combinaciones principales.';
+}
+function cancelCustomPalette() {customPaletteDraft=null;document.getElementById('custom-colors-panel').open=false;applyPaletteTokens();updatePreview();}
+async function persistPalette(p,custom=false) {
+ const status=document.getElementById('palette-status'),buttons=document.querySelectorAll('.palette-option, #save-custom-palette');buttons.forEach(button=>button.disabled=true);
+ status.textContent='Guardando '+p.name+'…';
  if(cloudPending)await cloudSaving;
- db.config={...db.config,themePalette:p.id,primaryColor:p.primary};
- db.rss=db.rss.map((feed,i)=>({...feed,bgColor:[p.soft,p.accent,p.bg][i%3],textColor:p.text}));
- applyPaletteTokens();updatePreview();
- try{const saved=await saveDB('config','rss');status.textContent=saved?'Paleta '+p.name+' guardada para todas las pantallas.':'No se pudo guardar la paleta. Intenta nuevamente.';}
- finally{buttons.forEach(button=>button.disabled=false);applyPaletteTokens();updatePreview();if(document.getElementById('tab-rss').classList.contains('active'))renderRSSInputs();}
+ db.config={...db.config,themePalette:p.id,primaryColor:p.primary,...(custom?{customColors:{...p}}:{})};
+ db.rss=db.rss.map((feed,i)=>({...feed,bgColor:custom?p.tickerBg:[p.soft,p.accent,p.bg][i%3],textColor:custom?p.tickerText:p.text}));
+ customPaletteDraft=null;applyPaletteTokens();updatePreview();
+ try{const saved=await saveDB('config','rss');status.textContent=saved?'Paleta '+p.name+' guardada para todas las pantallas.':'No se pudo guardar. Intenta nuevamente.';if(!saved&&custom){customPaletteDraft=p;applyPaletteTokens();updatePreview();}return saved;}
+ finally{buttons.forEach(button=>button.disabled=false);if(document.getElementById('tab-rss').classList.contains('active'))renderRSSInputs();}
+}
+async function choosePalette(id) {const p=COLOR_PALETTES.find(p=>p.id===id);if(p){customPaletteDraft=null;await persistPalette(expandedPalette(p));}}
+async function saveCustomPalette() {if(customPaletteDraft)await persistPalette({...customPaletteDraft},true);}
+async function saveCornerStyle() {
+ const select=document.getElementById('corner-style'),value=select.value,status=document.getElementById('corner-status');select.disabled=true;
+ try{if(cloudPending)await cloudSaving;db.config={...db.config,cornerStyle:value};applyPaletteTokens();const saved=await saveDB('config');status.textContent=saved?'Estilo de esquinas guardado para todas las pantallas.':'No se pudo guardar el estilo.';}
+ finally{select.disabled=false;select.value=db.config.cornerStyle==='square'?'square':'rounded';applyPaletteTokens();}
 }
 
 const API_URL='https://phqbcfjbsdibushvolqh.supabase.co/functions/v1/digiturno';
+const OPERATOR_API_URL=API_URL+'-operators';
 let cloudToken=sessionStorage.getItem('dt-session')||'', cloudUser=null, cloudReady=false, cloudPolling=false;
 let cloudVersions={}, cloudBaseline={}, cloudPending=0, cloudSaving=Promise.resolve(), cloudNoteTimer, cloudRequestId=null, cloudCallId=null;
 const sharedKeys=['operators','queue','activeCall','playlist','rss','services','clients','config','pushMessage','opHistory','msgLog','turnCounters'];
@@ -1540,7 +1626,7 @@ getSafeItem=(key,fallback)=>sharedKeys.includes(key)?(cloudMemory[key]??fallback
 function connectionStatus(text,bad=false){const el=document.getElementById('cloud-status');el.textContent=text;el.hidden=!bad;el.style.background=bad?'#9b2c2c':'#234e52';}
 async function cloudApi(action,payload={},token=cloudToken){
  const ctl=new AbortController(), timer=setTimeout(()=>ctl.abort(),20000);
- try{const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload,token}),signal:ctl.signal});const data=await response.json();if(!response.ok||data.error)throw new Error(data.error||'Error de conexión');return data;}
+ try{const response=await fetch(['account_update','profile','next','notes','preferences'].includes(action)?OPERATOR_API_URL:API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload,token}),signal:ctl.signal});const data=await response.json();if(!response.ok||data.error)throw new Error(data.error||'Error de conexión');return data;}
  catch(e){connectionStatus('Sin confirmar · '+(e.name==='AbortError'?'Tiempo de espera agotado':e.message),true);throw e;}
  finally{clearTimeout(timer);}
 }
@@ -1552,6 +1638,7 @@ async function refreshCloud(force=false){
  cloudPolling=true;
  try{
   const snap=await cloudApi('snapshot');
+  if(currentOperator){try{const profile=await cloudApi('profile');currentOperator=profile.sessionUser;cloudUser=profile.sessionUser;document.getElementById('op-welcome').textContent='Hola, '+currentOperator.name;document.getElementById('op-box-name').textContent=currentOperator.box;}catch(e){if(e.message.includes('Sesión finalizada')){cloudToken='';cloudUser=null;sessionStorage.removeItem('dt-session');originalLogout();document.getElementById('op-error').textContent=e.message;}}}
   const previous={services:JSON.stringify(db.services),playlist:JSON.stringify(db.playlist),rss:JSON.stringify(db.rss),config:JSON.stringify(db.config)};
   if(cloudPending)return;
   for(const key of sharedKeys)if(key in snap){if(key==='opHistory'&&document.activeElement?.id==='op-notes-area')continue;db[key]=snap[key];cloudMemory[key]=snap[key];}
@@ -1611,6 +1698,16 @@ async function flushNotes(){if(cloudNoteTimer||noteDirty){clearTimeout(cloudNote
 const originalSelectHistory=selectHistory;
 selectHistory=async function(id){try{await flushNotes();originalSelectHistory(id);}catch(e){showCloudError(e);}};
 addOperator=async function(){try{await cloudApi('account_add',{name:document.getElementById('admin-op-name').value,pin:document.getElementById('admin-op-pin').value,box:document.getElementById('admin-op-box').value});await refreshCloud(true);for(const id of ['admin-op-name','admin-op-pin','admin-op-box'])document.getElementById(id).value='';}catch(e){showCloudError(e);}};
+function editOperator(box) {
+ const op=db.operators.find(item=>item.box===box);if(!op)return;
+ document.getElementById('edit-op-original').value=op.box;document.getElementById('edit-op-name').value=op.name;document.getElementById('edit-op-box').value=op.box;document.getElementById('edit-op-pin').value='';document.getElementById('edit-op-error').textContent='';document.getElementById('edit-operator-dialog').showModal();document.getElementById('edit-op-name').focus();
+}
+async function submitOperatorEdit(event) {
+ event.preventDefault();const button=document.getElementById('edit-op-submit');if(button.disabled)return;button.disabled=true;
+ try{await cloudApi('account_update',{originalBox:document.getElementById('edit-op-original').value,name:document.getElementById('edit-op-name').value.trim(),box:document.getElementById('edit-op-box').value.trim(),pin:document.getElementById('edit-op-pin').value});document.getElementById('edit-op-pin').value='';document.getElementById('edit-operator-dialog').close();await refreshCloud(true);}
+ catch(e){document.getElementById('edit-op-error').textContent=e.message;}finally{button.disabled=false;}
+}
+
 removeOperator=async function(index){if(!confirm('¿Eliminar '+db.operators[index].box+'?'))return;try{await cloudApi('account_remove',{box:db.operators[index].box});await refreshCloud(true);}catch(e){showCloudError(e);}};
 sendPushMessage=function(){const text=document.getElementById('admin-push-msg').value.trim(),color=document.getElementById('admin-push-color').value;db.pushMessage={text,color};db.msgLog=cloudMemory.msgLog||[];if(text)db.msgLog=[...db.msgLog,{id:Date.now(),text,color,ts:Date.now()}].slice(-200);saveDB('pushMessage','msgLog').then(saved=>{if(saved)document.getElementById('admin-push-status').textContent='Mensaje guardado en Supabase';});};
 clearPushMessage=function(){db.pushMessage={text:'',color:'red'};document.getElementById('admin-push-msg').value='';saveDB('pushMessage');};
@@ -1622,7 +1719,7 @@ const businessProfiles={clinic:{name:'Clínica Central',icon:'🏥',services:[['
 async function applyBusiness(){const type=document.getElementById('business-type').value,p=businessProfiles[type];if(!confirm('¿Aplicar '+p.name+'? Se reemplazan servicios y mensaje de bienvenida. Los turnos pendientes e historial se conservan.'))return;db.config={...db.config,businessType:type,businessName:document.getElementById('business-name').value.trim()||p.name};db.services=p.services.map(([name,emoji])=>({name,emoji}));db.rss[0]={...db.rss[0],content:'Bienvenidos a '+db.config.businessName+' • Tenga su documento a mano'};await saveDB('config','services','rss');renderAdmin();applyBrand();}
 const originalRenderAdmin=renderAdmin;renderAdmin=function(){originalRenderAdmin();document.getElementById('business-type').value=db.config.businessType||'clinic';document.getElementById('business-name').value=db.config.businessName||'';};
 document.getElementById('business-type').addEventListener('change',e=>document.getElementById('business-name').value=businessProfiles[e.target.value].name);
-window.addEventListener('beforeunload',e=>{if(cloudPending||cloudNoteTimer||noteDirty){e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',e=>{if(cloudPending||cloudNoteTimer||noteDirty||customPaletteDraft){e.preventDefault();e.returnValue='';}});
 
 let lookupTimer;
 document.getElementById('kiosco-cedula').addEventListener('input',e=>{clearTimeout(lookupTimer);const cedula=e.target.value.trim();cloudRequestId=null;if(!cedula)return;lookupTimer=setTimeout(async()=>{try{const r=await cloudApi('lookup',{cedula});if(r.nombre&&document.getElementById('kiosco-cedula').value.trim()===cedula)document.getElementById('kiosco-nombre').value=r.nombre;}catch{}},400);});
@@ -1635,6 +1732,7 @@ checkCalls=function(){
 const originalStartPlaylist=startPlaylist;
 startPlaylist=function(){clearTimeout(mediaTimer);currentMediaIndex=db.playlist.length?currentMediaIndex%db.playlist.length:0;if(!db.playlist.length){document.getElementById('media-container').replaceChildren();return;}originalStartPlaylist();};
 renderPalettePicker();
+document.getElementById('custom-colors-panel').addEventListener('toggle',()=>{if(document.getElementById('custom-colors-panel').open&&!customPaletteDraft)openCustomPalette();});
 refreshCloud();setInterval(()=>refreshCloud(),2000);
 
 </script>
