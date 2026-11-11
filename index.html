@@ -233,7 +233,7 @@
     </style>
 </head>
 <body>
-<div id="cloud-status" role="status" style="position:fixed;bottom:5px;right:8px;z-index:20000;background:#234e52;color:white;padding:5px 10px;border-radius:6px;font:12px sans-serif;pointer-events:none">Conectando con Supabase…</div>
+<div id="cloud-status" role="status" hidden style="position:fixed;bottom:5px;right:8px;z-index:20000;background:#234e52;color:white;padding:5px 10px;border-radius:6px;font:12px sans-serif;pointer-events:none">Conectando con Supabase…</div>
 <dialog id="admin-auth" style="margin:auto;border:0;border-radius:15px;padding:30px;max-width:420px;width:90%"><form onsubmit="loginAdmin(event)"><h2>Acceso Administrador</h2><label for="admin-password">Contraseña</label><input id="admin-password" type="password" autocomplete="current-password" required style="width:100%;padding:12px;margin:15px 0"><p id="admin-auth-error" style="color:#c53030"></p><button class="btn" type="submit">Ingresar</button><button class="btn" type="button" style="margin-top:8px;background:#718096" onclick="document.getElementById('admin-auth').close()">Cancelar</button></form></dialog>
 
     <div id="secret-trigger" onmousedown="startHold()" onmouseup="cancelHold()" onmouseleave="cancelHold()" ontouchstart="startHold()" ontouchend="cancelHold()"></div>
@@ -1383,7 +1383,7 @@ let noteChain=Promise.resolve(),noteDirty=false;
 let cloudMemory={},pendingServiceNames=[],cloudCalls=[],callBacklog=[],seenCalls=new Set();
 const localSafeItem=getSafeItem;
 getSafeItem=(key,fallback)=>sharedKeys.includes(key)?(cloudMemory[key]??fallback):localSafeItem(key,fallback);
-function connectionStatus(text,bad=false){const el=document.getElementById('cloud-status');el.textContent=text;el.style.background=bad?'#9b2c2c':'#234e52';}
+function connectionStatus(text,bad=false){const el=document.getElementById('cloud-status');el.textContent=text;el.hidden=!bad;el.style.background=bad?'#9b2c2c':'#234e52';}
 async function cloudApi(action,payload={},token=cloudToken){
  const ctl=new AbortController(), timer=setTimeout(()=>ctl.abort(),20000);
  try{const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload,token}),signal:ctl.signal});const data=await response.json();if(!response.ok||data.error)throw new Error(data.error||'Error de conexión');return data;}
