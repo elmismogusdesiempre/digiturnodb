@@ -206,10 +206,18 @@
         .usage { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
         .usage-bar { flex: 1; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
         #rss-usage-fill { height: 100%; background: #38a169; transition: width .2s; }
-        /* Playlist: llenar la zona sin franjas negras */
+        /* Ajuste de videos: imagen completa con fondo o llenado con recorte. */
         #media-container { position: relative; container-type: size; }
-        .media-content { object-fit: cover !important; width: 100%; height: 100%; display: block; }
-        .media-content.yt { position: absolute; top: 50%; left: 50%; width: max(100cqw, 177.78cqh); height: max(100cqh, 56.25cqw); transform: translate(-50%, -50%); border: 0; }
+        .media-content { object-fit: cover; width: 100%; height: 100%; display: block; }
+        .media-video-frame { position: relative; width: 100%; height: 100%; overflow: hidden; isolation: isolate; container-type: size; }
+        .media-video-frame > .media-content { position: relative; z-index: 1; }
+        .media-video-frame > .media-backdrop { position: absolute; z-index: 0; top: -5%; left: -5%; width: 110%; height: 110%; object-fit: cover; filter: blur(20px) brightness(.65); pointer-events: none; }
+        .media-video-frame[data-video-fit="blur"] > video.media-content { object-fit: contain; }
+        .media-video-frame[data-video-fit="cover"] > .media-backdrop { display: none; }
+        .media-video-frame > .media-content.yt { position: absolute; top: 50%; left: 50%; width: max(100cqw, calc(100cqh * var(--embed-ratio, 1.77777778))); height: max(100cqh, calc(100cqw / var(--embed-ratio, 1.77777778))); transform: translate(-50%, -50%); border: 0; }
+        .media-video-frame[data-video-fit="blur"] > .media-content.yt { width: min(100cqw, calc(100cqh * var(--embed-ratio, 1.77777778))); height: min(100cqh, calc(100cqw / var(--embed-ratio, 1.77777778))); }
+        .media-video-frame > img.yt-preview { object-fit: contain; background: transparent; }
+        .media-video-frame[data-video-fit="cover"] > img.yt-preview { object-fit: cover; }
         .rss-text { padding-left: 0 !important; white-space: nowrap; will-change: transform; }
         .tv-grid.no-video .tv-right-col { grid-column: 1; }
         /* Operador: 3 tarjetas a todo el ancho */
@@ -354,6 +362,14 @@
             <div class="form-group" style="margin-top: 15px; flex-direction: row; align-items: center; gap: 10px;">
                 <label>Mostrar Video en TV</label>
                 <input type="checkbox" class="toggle-switch" id="toggle-video" onchange="saveConfig()">
+            </div>
+            <div class="form-group">
+                <label for="video-fit">Ajuste de los videos</label>
+                <select id="video-fit" onchange="saveConfig()">
+                    <option value="blur">Video completo con fondo desenfocado</option>
+                    <option value="cover">Llenar pantalla con recorte</option>
+                </select>
+                <p style="font-size:.8rem;color:var(--text-muted);margin-top:8px">Se aplica a la TV y a la vista previa. En YouTube, el fondo usa la miniatura y el formato depende del reproductor; MP4/WebM permite un ajuste exacto.</p>
             </div>
         </div>
     </div>
@@ -658,6 +674,7 @@
             
             // Config
             document.getElementById('toggle-video').checked = db.config.showVideo;
+            document.getElementById('video-fit').value = videoFitMode();
             renderLogoTab();
 
             renderRSSInputs();
@@ -772,14 +789,53 @@
             if (/\.(mp4|webm|ogv|ogg|mov|m4v)$/.test(path)) return 'video';
             return 'auto';
         }
-        function mediaHTML(url) {
+        function videoFitMode() { return db.config.videoFit === 'cover' ? 'cover' : 'blur'; }
+        function directVideoHTML(url) {
+            return `<div class="media-video-frame" data-video-fit="${videoFitMode()}"><canvas class="media-backdrop" aria-hidden="true"></canvas><video src="${esc(url)}" class="media-content" autoplay muted loop playsinline onloadeddata="startVideoBackdrop(this)" onplay="startVideoBackdrop(this)" onseeked="startVideoBackdrop(this)"></video></div>`;
+        }
+        // El fondo se dibuja desde el video principal: una sola reproducción y sin desfase.
+        function startVideoBackdrop(video) {
+            if (video._backdropRunning || video.readyState < 2 || !video.videoWidth) return;
+            const frame = video.closest('.media-video-frame'), canvas = frame?.querySelector('canvas');
+            if (!canvas || frame.dataset.videoFit !== 'blur') return;
+            const context = canvas.getContext('2d');
+            if (!context) return;
+            canvas.width = Math.max(1, Math.round(Math.min(480, video.videoWidth)));
+            canvas.height = Math.max(1, Math.round(canvas.width * video.videoHeight / video.videoWidth));
+            video._backdropRunning = true;
+            let lastDraw = -Infinity;
+            const draw = time => {
+                if (!video.isConnected || frame.dataset.videoFit !== 'blur') { video._backdropRunning = false; return; }
+                if (time - lastDraw >= 80) {
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    lastDraw = time;
+                }
+                if (video.paused || video.ended) { video._backdropRunning = false; return; }
+                if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(draw);
+                else requestAnimationFrame(draw);
+            };
+            draw(performance.now());
+        }
+        function replaceMediaWithVideo(image) { image.outerHTML = directVideoHTML(image.src); }
+        function applyVideoFit(root) {
+            root.querySelectorAll('.media-video-frame').forEach(frame => {
+                frame.dataset.videoFit = videoFitMode();
+                const video = frame.querySelector('video');
+                if (video) startVideoBackdrop(video);
+            });
+        }
+        function mediaHTML(url, preview = false) {
             const k = mediaKind(url);
             if (k === 'youtube') {
                 const m = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);
-                return m ? `<iframe class="media-content yt" src="https://www.youtube.com/embed/${m[1]}?autoplay=1&mute=1&controls=0&loop=1&playlist=${m[1]}" allow="autoplay; encrypted-media"></iframe>` : '';
+                if (!m) return '';
+                const thumbnail = `https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg`;
+                const ratio = /\/shorts\//.test(url) ? 0.5625 : 1.77777778;
+                const foreground = preview ? `<img class="media-content yt-preview" src="${thumbnail}" alt="Vista previa de YouTube">` : `<iframe class="media-content yt" src="https://www.youtube.com/embed/${m[1]}?autoplay=1&mute=1&controls=0&loop=1&playlist=${m[1]}" title="Video de YouTube" allow="autoplay; encrypted-media"></iframe>`;
+                return `<div class="media-video-frame" data-video-fit="${videoFitMode()}" style="--embed-ratio:${ratio}"><img class="media-backdrop" src="${thumbnail}" alt="" aria-hidden="true">${foreground}</div>`;
             }
-            if (k === 'video') return `<video src="${esc(url)}" class="media-content" autoplay muted loop playsinline></video>`;
-            return `<img src="${esc(url)}" class="media-content" onerror="this.outerHTML='<video src=&quot;'+this.src+'&quot; class=&quot;media-content&quot; autoplay muted loop playsinline></video>'">`;
+            if (k === 'video') return directVideoHTML(url);
+            return `<img src="${esc(url)}" class="media-content" onerror="replaceMediaWithVideo(this)">`;
         }
 
         // ---- Logo ----
@@ -838,9 +894,10 @@
             grid.style.gridTemplateRows = feeds.length ? `1fr ${feeds.reduce((a, f) => a + f.size * UNIT, 0) * PX}px` : '1fr';
             const v = st.querySelector('#pv-video'); v.style.display = show ? 'flex' : 'none';
             const m = db.playlist[0], key = show + '|' + (m ? m.url : '');
+            applyVideoFit(v);
             if (v.dataset.k !== key) {
                 v.dataset.k = key;
-                st.querySelector('#pv-media').innerHTML = !m ? '<span style="color:#888;font-size:40px">Sin multimedia</span>' : (mediaKind(m.url) === 'youtube' ? '<span style="color:#fff;font-size:60px">▶ YouTube</span>' : mediaHTML(m.url));
+                st.querySelector('#pv-media').innerHTML = !m ? '<span style="color:#888;font-size:40px">Sin multimedia</span>' : mediaHTML(m.url, true);
             }
             applyLogo(st.querySelector('#pv-logo'));
             const r = st.querySelector('#pv-rss'); r.style.display = feeds.length ? 'flex' : 'none';
@@ -928,6 +985,7 @@
         
         function saveConfig() {
             db.config.showVideo = document.getElementById('toggle-video').checked;
+            db.config.videoFit = document.getElementById('video-fit').value;
             saveDB();
             updatePreview();
         }
@@ -1216,6 +1274,7 @@
             const zonaVideo = document.getElementById('zona-video');
             const zonaDerecha = document.getElementById('zona-derecha');
             const tvGrid = document.getElementById('tv-grid');
+            applyVideoFit(document.getElementById('media-container'));
 
             tvGrid.classList.toggle('no-video', !db.config.showVideo);
             applyLogo(document.getElementById('tv-logo'));
